@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LoDeAyer — El álbum completo de tu boda, al día siguiente</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink: '#0b0b0c',
+        smoke: '#141416',
+        paper: '#f4efe7',
+        champagne: '#d9b98a',
+        champagne2: '#e8c878',
+      },
+      fontFamily: {
+        serif: ['Cormorant Garant', 'serif'],
+        sans: ['Inter', 'sans-serif'],
+      },
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+<script>
+Babel.registerPreset('react-classic', {
+  presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]]
+});
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: #0b0b0c; }
+
+  .grain::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .03;
+    z-index: 50;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .marquee-inner {
+    animation: marquee 20s linear infinite;
+    display: flex;
+    width: max-content;
+  }
+
+  .dotted-bg {
+    background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .modal-overlay {
+    animation: fadeIn 0.15s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .phone-glow {
+    box-shadow: 0 0 80px rgba(217,185,138,0.15), 0 40px 80px rgba(0,0,0,0.6);
+  }
+</style>
+</head>
+<body class="grain text-paper font-sans antialiased">
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react-classic">
+const { useState, useEffect } = React;
+
+const PHOTOS = {
+  hero: 'https://images.pexels.com/photos/25637515/pexels-photo-25637515.jpeg?auto=compress&cs=tinysrgb&h=1200&w=800',
+  dancing: 'https://images.pexels.com/photos/15964956/pexels-photo-15964956.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+  friends: 'https://images.pexels.com/photos/34327735/pexels-photo-34327735.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+  toast: 'https://images.pexels.com/photos/636006/pexels-photo-636006.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+  garden: 'https://images.pexels.com/photos/16356687/pexels-photo-16356687.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+  bokeh: 'https://images.pexels.com/photos/9156491/pexels-photo-9156491.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+  bride: 'https://images.pexels.com/photos/35536264/pexels-photo-35536264.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+  dancing2: 'https://images.pexels.com/photos/15964962/pexels-photo-15964962.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+  candid: 'https://images.pexels.com/photos/12031113/pexels-photo-12031113.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+  couple: 'https://images.pexels.com/photos/36200504/pexels-photo-36200504.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+};
+
+/* ── Modal ── */
+const Modal = ({ open, tier, onClose }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    const handler = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  if (!open) return null;
+
+  const submit = e => {
+    e.preventDefault();
+    if (!name || !email) return;
+    setDone(true);
+  };
+
+  return (
+    <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center px-4"
+         style={{background: 'rgba(11,11,12,0.85)', backdropFilter: 'blur(8px)'}}
+         onClick={onClose}>
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-smoke p-8 shadow-2xl"
+           onClick={e => e.stopPropagation()}>
+        {done ? (
+          <div className="text-center py-4">
+            <div className="text-4xl mb-4">🎉</div>
+            <h3 className="font-bold text-xl mb-2">¡Listo!</h3>
+            <p className="text-paper/60 text-sm">Te avisamos cuando LoDeAyer esté disponible. También puedes escribirnos por WhatsApp.</p>
+            <a href="https://wa.me/51999999999?text=Hola,%20quiero%20crear%20mi%20evento%20con%20LoDeAyer"
+               target="_blank"
+               className="inline-block mt-5 rounded-full bg-[#25D366] text-white text-sm font-semibold px-6 py-2.5">
+              Abrir WhatsApp
+            </a>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h3 className="font-bold text-lg">Crear mi evento</h3>
+                {tier && <p className="text-sm text-champagne mt-1">Plan: {tier}</p>}
+              </div>
+              <button onClick={onClose} className="text-paper/40 hover:text-paper text-xl leading-none">×</button>
+            </div>
+            <form onSubmit={submit} className="space-y-4">
+              <div>
+                <label className="block text-xs text-paper/50 mb-1.5 uppercase tracking-wider">Nombre</label>
+                <input type="text" required value={name} onChange={e => setName(e.target.value)}
+                       placeholder="Tu nombre"
+                       className="w-full rounded-xl border border-white/10 bg-ink px-4 py-3 text-sm placeholder-paper/30 focus:outline-none focus:border-champagne/50 transition" />
+              </div>
+              <div>
+                <label className="block text-xs text-paper/50 mb-1.5 uppercase tracking-wider">Email</label>
+                <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                       placeholder="tu@email.com"
+                       className="w-full rounded-xl border border-white/10 bg-ink px-4 py-3 text-sm placeholder-paper/30 focus:outline-none focus:border-champagne/50 transition" />
+              </div>
+              <button type="submit"
+                      className="w-full rounded-full bg-paper text-ink font-bold py-3 text-sm hover:bg-white transition mt-2">
+                Reservar mi lugar
+              </button>
+            </form>
+            <div className="mt-4 text-center">
+              <span className="text-xs text-paper/30">o </span>
+              <a href="https://wa.me/51999999999?text=Hola,%20quiero%20crear%20mi%20evento%20con%20LoDeAyer"
+                 target="_blank"
+                 className="text-xs text-[#25D366] hover:underline">Prefiero WhatsApp</a>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* ── Nav ── */
+const Nav = ({ onCTA }) => (
+  <header className="fixed top-0 inset-x-0 z-40 border-b border-white/5 bg-ink/80 backdrop-blur">
+    <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
+      <a href="#" className="font-serif italic text-xl tracking-tight text-paper" style={{fontWeight: 500}}>LoDeAyer</a>
+      <nav className="hidden md:flex items-center gap-8 text-[13px] text-paper/60">
+        <a href="#como" className="hover:text-paper transition">Cómo funciona</a>
+        <a href="#precios" className="hover:text-paper transition">Precios</a>
+        <a href="#faq" className="hover:text-paper transition">FAQ</a>
+      </nav>
+      <button onClick={() => onCTA('general')}
+              className="rounded-full bg-paper text-ink text-[13px] font-bold px-5 py-2.5 hover:bg-white transition">
+        Crear mi evento
+      </button>
+    </div>
+  </header>
+);
+
+/* ── Hero ── */
+const Hero = ({ onCTA }) => (
+  <section className="relative flex flex-col justify-end overflow-hidden" style={{minHeight: '100svh'}}>
+    <img
+      src="https://images.pexels.com/photos/15964956/pexels-photo-15964956.jpeg?auto=compress&cs=tinysrgb&h=1280&w=1920"
+      alt="Invitados bailando en una boda"
+      loading="eager"
+      className="absolute inset-0 w-full h-full object-cover"
+      style={{objectPosition: 'center 20%'}}
+    />
+    <div className="absolute inset-0" style={{background: 'linear-gradient(to bottom, rgba(11,11,12,0.35) 0%, rgba(11,11,12,0.45) 40%, rgba(11,11,12,0.82) 72%, rgba(11,11,12,1) 100%)'}}></div>
+    <div className="relative z-10 w-full mx-auto max-w-6xl px-6 pb-16 md:pb-24">
+      <p className="text-[10px] uppercase tracking-[0.3em] text-paper/50 mb-5">Tu boda en manos de todos</p>
+      <h1 className="leading-[1.0] max-w-3xl">
+        <span className="block text-[2.6rem] sm:text-[3.8rem] md:text-[5rem] font-black tracking-tight text-paper">Tu boda, tu día,</span>
+        <span className="block font-serif italic text-champagne" style={{fontSize: 'clamp(2.6rem, 8vw, 5rem)', fontWeight: 400, lineHeight: 1.05}}>visto con los ojos de todos.</span>
+      </h1>
+      <p className="mt-6 text-paper/70 text-lg leading-relaxed max-w-lg">
+        LoDeAyer convierte los celulares de tus invitados en una cámara colectiva. Sin app, sin cuenta, sin fricción.
+      </p>
+      <div className="mt-8 flex flex-wrap gap-4">
+        <button onClick={() => onCTA('general')}
+                className="rounded-full bg-paper text-ink font-bold px-8 py-3.5 hover:bg-white transition text-[15px]">
+          Crear mi evento
+        </button>
+        <a href="#como"
+           className="rounded-full border border-white/25 px-8 py-3.5 text-paper/90 hover:border-white/50 transition text-[15px]">
+          Ver cómo funciona
+        </a>
+      </div>
+    </div>
+  </section>
+);
+
+/* ── Marquee ── */
+const Marquee = () => {
+  const items = ['Bodas', 'Quinceañeras', 'Cumpleaños', 'Aniversarios', 'Eventos', 'Fiestas', 'Reuniones'];
+  const doubled = [...items, ...items, ...items, ...items];
+  return (
+    <div className="border-y border-white/5 bg-smoke/40 overflow-hidden py-4">
+      <div className="marquee-inner">
+        {doubled.map((item, i) => (
+          <span key={i} className="text-sm text-paper/40 px-8 whitespace-nowrap">
+            {item} <span className="text-champagne/40 mx-2">·</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ── Bento Grid ── */
+const BentoGrid = () => (
+  <section className="py-20 px-6">
+    <div className="mx-auto max-w-6xl">
+      <div className="mb-8">
+        <p className="text-xs uppercase tracking-[0.25em] text-champagne/80 mb-3">El resultado</p>
+        <h2 className="text-3xl sm:text-4xl font-black">Una boda. Mil miradas.</h2>
+      </div>
+      <div className="grid gap-3" style={{gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(3, 160px)'}}>
+        <div className="rounded-2xl overflow-hidden relative" style={{gridColumn: '1/3', gridRow: '1/3'}}>
+          <img src={PHOTOS.dancing} alt="Invitados bailando" loading="lazy" className="w-full h-full object-cover" />
+          <div className="absolute inset-0" style={{background: 'linear-gradient(to top, rgba(11,11,12,0.7) 0%, transparent 50%)'}}></div>
+          <div className="absolute bottom-4 left-4">
+            <p className="text-xs text-paper/60 uppercase tracking-wider">La pista</p>
+            <p className="font-serif italic text-sm">1:47 am</p>
+          </div>
+        </div>
+        <div className="rounded-2xl overflow-hidden" style={{gridColumn: '3', gridRow: '1'}}>
+          <img src={PHOTOS.toast} alt="Brindis" loading="lazy" className="w-full h-full object-cover" />
+        </div>
+        <div className="rounded-2xl overflow-hidden relative" style={{gridColumn: '4', gridRow: '1/3'}}>
+          <img src={PHOTOS.bride} alt="Novia" loading="lazy" className="w-full h-full object-cover" />
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-smoke flex flex-col items-center justify-center p-4" style={{gridColumn: '3', gridRow: '2'}}>
+          <p className="text-3xl font-black text-champagne">287</p>
+          <p className="text-xs text-paper/50 mt-1">fotos subidas</p>
+        </div>
+        <div className="rounded-2xl overflow-hidden" style={{gridColumn: '1', gridRow: '3'}}>
+          <img src={PHOTOS.friends} alt="Amigas de la novia" loading="lazy" className="w-full h-full object-cover" />
+        </div>
+        <div className="rounded-2xl overflow-hidden" style={{gridColumn: '2', gridRow: '3'}}>
+          <img src={PHOTOS.garden} alt="Pareja al aire libre" loading="lazy" className="w-full h-full object-cover" />
+        </div>
+        <div className="rounded-2xl border border-champagne/20 bg-smoke flex flex-col items-center justify-center p-4" style={{gridColumn: '3/5', gridRow: '3'}}>
+          <p className="font-serif italic text-lg text-paper/80 text-center leading-snug">"287 fotos · 34 personas · 1 boda"</p>
+          <p className="text-xs text-paper/40 mt-2">Boda de Ana &amp; Carlos · Lima</p>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+/* ── El problema ── */
+const Problema = () => {
+  const cards = [
+    { icon: '📱', title: 'El grupo de WhatsApp', desc: '80 fotos pixeladas y 200 que nunca se subieron.' },
+    { icon: '⏳', title: '"Después te las paso"', desc: 'La prima que lo prometió. Nunca pasa nada.' },
+    { icon: '📷', title: 'El fotógrafo profesional', desc: 'Entrega en dos meses. Y solo lo que él vio.' },
+    { icon: '🌀', title: 'Los momentos espontáneos', desc: 'Viviendo para siempre en celulares ajenos.' },
+  ];
+  return (
+    <section className="py-24 px-6 dotted-bg">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-14">
+          <p className="text-xs uppercase tracking-[0.25em] text-champagne/80 mb-3">El problema</p>
+          <h2 className="text-3xl sm:text-4xl font-black max-w-xl leading-tight">
+            Tu boda va a generar cientos de fotos. <span className="text-champagne2">¿Cuántas vas a ver tú?</span>
+          </h2>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-5">
+          {cards.map(c => (
+            <div key={c.title} className="rounded-2xl border border-white/8 bg-smoke/60 p-7 hover:border-white/15 transition">
+              <div className="text-2xl mb-4">{c.icon}</div>
+              <p className="font-bold text-base mb-2">{c.title}</p>
+              <p className="text-sm text-paper/50 leading-relaxed">{c.desc}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-10 text-paper/50 max-w-2xl leading-relaxed">
+          Después de la boda nadie tiene tiempo de andar recolectando fotos. Por eso casi ninguna pareja
+          termina con el álbum completo de su propio matrimonio.
+        </p>
+      </div>
+    </section>
+  );
+};
+
+/* ── Phone Mockup ── */
+const PhoneMockup = ({ onCTA }) => (
+  <div className="relative mx-auto" style={{width: 280}}>
+    <div className="rounded-[3rem] overflow-hidden border-[3px] border-white/15 shadow-2xl" style={{height: 580, background: '#0b0b0c', boxShadow: '0 0 80px rgba(217,185,138,0.12), 0 40px 80px rgba(0,0,0,0.7)'}}>
+      <div className="absolute left-1/2 -translate-x-1/2 top-0 h-5 w-24 rounded-b-2xl bg-[#0b0b0c] z-10"></div>
+      <img src={PHOTOS.hero} alt="Boda de Ana y Carlos" loading="lazy" className="w-full h-full object-cover" style={{filter: 'brightness(0.5)'}} />
+      <div className="absolute inset-0 flex flex-col justify-between p-5 pt-10">
+        <div className="text-center">
+          <p className="text-[9px] text-paper/40 uppercase tracking-[0.25em]">LODEAYER</p>
+          <p className="font-serif italic text-xl mt-1 text-paper">Boda de Ana &amp; Carlos</p>
+          <p className="text-[10px] text-paper/45 mt-0.5">Sáb 14 nov · Lima, Perú</p>
+        </div>
+        <div>
+          <div className="grid grid-cols-3 gap-2 text-center mb-4">
+            {[['287','FOTOS'],['34','INVITADOS'],['9h','REVELADO']].map(([n,l]) => (
+              <div key={l} className="rounded-xl py-3 border border-white/15" style={{background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)'}}>
+                <p className="text-sm font-bold text-paper">{n}</p>
+                <p className="text-[8px] text-paper/45 uppercase tracking-wider mt-0.5">{l}</p>
+              </div>
+            ))}
+          </div>
+          <button onClick={() => onCTA && onCTA('general')}
+                  className="w-full rounded-full bg-paper text-ink text-[13px] font-bold py-3">
+            + Subir mis fotos
+          </button>
+          <p className="text-center text-[9px] text-paper/35 mt-2">Tu carrete: 13 de 20 disparos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+/* ── Cómo funciona ── */
+const ComoFunciona = ({ onCTA }) => {
+  const steps = [
+    { n: '1', title: 'Crea tu evento', desc: 'Cinco minutos desde el celular. Elige el carrete, la hora del revelado, y obtienes tu QR.' },
+    { n: '2', title: 'Comparte el QR', desc: 'En las mesas, en la invitación, por WhatsApp. Tus invitados entran sin descargar nada, solo con su nombre.' },
+    { n: '3', title: 'Recibe el álbum', desc: 'Todas las fotos de todos, organizadas por momento del día. Al día siguiente, por WhatsApp.' },
+  ];
+  return (
+    <section id="como" className="py-24 px-6">
+      <div className="mx-auto max-w-6xl grid md:grid-cols-2 gap-16 items-center">
+        <div className="order-2 md:order-1">
+          <PhoneMockup onCTA={onCTA} />
+        </div>
+        <div className="order-1 md:order-2">
+          <p className="text-xs uppercase tracking-[0.25em] text-champagne/80 mb-3">La solución</p>
+          <h2 className="text-3xl sm:text-4xl font-black mb-10">
+            Un QR en cada mesa. <span className="font-serif italic font-normal text-champagne">Eso es todo.</span>
+          </h2>
+          <div className="space-y-6">
+            {steps.map(s => (
+              <div key={s.n} className="flex gap-5 items-start">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full border border-champagne/30 flex items-center justify-center">
+                  <span className="text-champagne font-black text-sm">{s.n}</span>
+                </div>
+                <div>
+                  <p className="font-bold text-base mb-1">{s.title}</p>
+                  <p className="text-sm text-paper/50 leading-relaxed">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ── El Revelado ── */
+const Revelado = () => (
+  <section className="py-24 px-6 border-y border-white/5 bg-smoke/40">
+    <div className="mx-auto max-w-6xl grid md:grid-cols-2 gap-16 items-center">
+      <div>
+        <p className="text-xs uppercase tracking-[0.25em] text-champagne/80 mb-3">El Revelado</p>
+        <h2 className="text-3xl sm:text-4xl font-black leading-tight">
+          Esa noche, nadie ve nada.<br/>
+          <span className="font-serif italic font-normal text-champagne">A la mañana siguiente, todos lo ven todo.</span>
+        </h2>
+        <p className="mt-6 text-paper/60 leading-relaxed max-w-md">
+          Las fotos quedan selladas hasta la hora que tú elijas. A las 9:00 am, cada invitado recibe el
+          revelado por WhatsApp: la fiesta completa, contada desde 34 cámaras distintas.
+          El desayuno más entretenido del año.
+        </p>
+        <div className="mt-6 inline-flex items-center gap-2 text-sm text-paper/50">
+          <div className="h-2 w-2 rounded-full bg-[#25D366]"></div>
+          9:02 am · 34 mensajes en el grupo
+        </div>
+      </div>
+      <div className="w-full max-w-sm mx-auto md:mx-0">
+        <div className="rounded-3xl border border-white/10 bg-ink p-5">
+          <div className="flex items-center gap-3 pb-4 mb-4 border-b border-white/5">
+            <div className="h-8 w-8 rounded-full bg-[#25D366] flex items-center justify-center text-white text-sm font-bold">L</div>
+            <div>
+              <p className="text-sm font-semibold">LoDeAyer</p>
+              <p className="text-[10px] text-paper/40">En línea</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-[#1f2c24] border border-white/5 p-3.5">
+                <p className="text-sm leading-relaxed">☀️ Buenos días. Lo de ayer ya está revelado.</p>
+                <p className="mt-1.5 text-sm text-[#4ade80] underline underline-offset-2">Ver las fotos de la boda →</p>
+                <p className="text-right text-[10px] text-paper/30 mt-1">9:00 ✓✓</p>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <div className="max-w-[75%] rounded-2xl rounded-tr-sm bg-white/8 border border-white/5 p-3.5">
+                <p className="text-sm">JAJAJA la foto de la mesa 7 😭😭</p>
+                <p className="text-right text-[10px] text-paper/30 mt-1">9:04</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-[#1f2c24] border border-white/5 p-3.5">
+                <p className="text-sm">Y tu papá bailando cuando creía que nadie lo veía 😂</p>
+                <p className="text-right text-[10px] text-paper/30 mt-1">9:05 ✓✓</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+/* ── Stats ── */
+const Stats = () => (
+  <section className="py-24 px-6">
+    <div className="mx-auto max-w-6xl">
+      <div className="text-center mb-14">
+        <p className="text-xs uppercase tracking-[0.25em] text-champagne/80 mb-3">Por qué funciona</p>
+        <h2 className="text-3xl sm:text-4xl font-black">Sin app, <span className="text-champagne2">no hay excusas.</span></h2>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <div className="rounded-2xl border border-white/10 bg-smoke p-10 text-center">
+          <p className="font-black text-paper/25" style={{fontSize: '4rem', lineHeight: 1}}>10-15%</p>
+          <p className="mt-4 text-sm text-paper/40 leading-relaxed">de invitados participa cuando la app<br/>exige descarga y cuenta</p>
+        </div>
+        <div className="rounded-2xl border border-champagne/30 bg-smoke p-10 text-center" style={{boxShadow: '0 0 40px rgba(217,185,138,0.08)'}}>
+          <p className="font-black text-champagne" style={{fontSize: '4rem', lineHeight: 1}}>75-85%</p>
+          <p className="mt-4 text-sm text-paper/60 leading-relaxed">participa con un QR sin descarga,<br/>como LoDeAyer</p>
+        </div>
+      </div>
+      <p className="text-center mt-6 text-xs text-paper/25">Datos de la industria de fotos de eventos.</p>
+    </div>
+  </section>
+);
+
+/* ── Lo que recibes ── */
+const LoQueRecibes = () => {
+  const feats = [
+    'Todas las fotos organizadas por momentos del día',
+    'Descarga en un clic, en calidad original',
+    'Galería online privada para compartir',
+    'Un mini álbum personal para cada invitado',
+    'Tú revisas y apruebas antes de publicar',
+    'Fotos sin compresión tipo WhatsApp',
+  ];
+  return (
+    <section className="py-24 px-6 dotted-bg">
+      <div className="mx-auto max-w-6xl grid md:grid-cols-2 gap-16 items-center">
+        <div>
+          <p className="text-xs uppercase tracking-[0.25em] text-champagne/80 mb-3">Al final</p>
+          <h2 className="text-3xl sm:text-4xl font-black leading-tight">
+            El álbum completo de tu boda.<br/>
+            <span className="font-serif italic font-normal text-champagne">De verdad completo.</span>
+          </h2>
+          <div className="mt-8 grid grid-cols-1 gap-3">
+            {feats.map(f => (
+              <div key={f} className="flex items-start gap-3">
+                <span className="mt-0.5 text-champagne text-sm flex-shrink-0">✓</span>
+                <span className="text-sm text-paper/70 leading-relaxed">{f}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-3xl border border-white/10 bg-smoke p-6">
+          <div className="flex items-center justify-between mb-5">
+            <p className="font-serif italic text-lg">Boda de Ana &amp; Carlos</p>
+            <span className="text-xs text-paper/40 bg-white/5 rounded-full px-3 py-1">312 fotos</span>
+          </div>
+          {[
+            {label:'Ceremonia', photos:[PHOTOS.bride, PHOTOS.couple, PHOTOS.hero, PHOTOS.garden, PHOTOS.friends]},
+            {label:'Brindis',   photos:[PHOTOS.toast, PHOTOS.bokeh, PHOTOS.friends, PHOTOS.garden, PHOTOS.candid]},
+            {label:'Fiesta',    photos:[PHOTOS.dancing, PHOTOS.dancing2, PHOTOS.candid, PHOTOS.couple, PHOTOS.bokeh]},
+          ].map(({label: m, photos: rowPhotos}, mi) => (
+            <div key={m} className={mi > 0 ? 'mt-4' : ''}>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-paper/40 mb-2">{m}</p>
+              <div className="grid grid-cols-5 gap-1.5">
+                {rowPhotos.map((src, i) => (
+                  <div key={i} className="aspect-square rounded-lg overflow-hidden border border-white/5">
+                    <img src={src} alt={m} loading="lazy" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          <button className="mt-5 w-full rounded-full bg-paper text-ink text-sm font-bold py-3">
+            Descargar álbum completo
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ── Pricing ── */
+const Pricing = ({ onCTA }) => {
+  const tiers = [
+    { name: 'Prueba', price: '$0', desc: 'Para probar', popular: false,
+      feats: ['15 invitados', '10 fotos / persona', 'El Revelado', 'Álbum organizado', 'Galería 7 días'] },
+    { name: 'Fiesta', price: '$49', desc: 'Celebraciones', popular: false,
+      feats: ['50 invitados', 'Carrete configurable', 'El Revelado', 'Mini álbumes', 'Galería 30 días'] },
+    { name: 'Boda', price: '$89', desc: 'El plan principal', popular: true,
+      feats: ['150 invitados', 'Carrete configurable', 'El Revelado', 'Mini álbumes', 'Calidad original', 'Co-admin', 'Galería 90 días'] },
+    { name: 'Boda Total', price: '$159', desc: 'Sin límites', popular: false,
+      feats: ['Ilimitados', 'Carrete configurable', 'El Revelado', 'Mini álbumes', 'Calidad original', 'QR impreso', 'Galería 1 año'] },
+  ];
+  return (
+    <section id="precios" className="py-24 px-6">
+      <div className="mx-auto max-w-6xl">
+        <div className="text-center mb-14">
+          <p className="text-xs uppercase tracking-[0.25em] text-champagne/80 mb-3">Precios</p>
+          <h2 className="text-3xl sm:text-4xl font-black">Elige tu evento.</h2>
+          <p className="mt-3 text-sm text-paper/40">Pago único por evento. En dólares.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {tiers.map(t => (
+            <div key={t.name} className={`rounded-2xl border p-7 flex flex-col transition-transform hover:-translate-y-1 ${t.popular ? 'border-champagne/40 bg-smoke' : 'border-white/8 bg-smoke/50'}`}
+                 style={t.popular ? {boxShadow: '0 0 40px rgba(217,185,138,0.1)'} : {}}>
+              {t.popular && <p className="text-[10px] uppercase tracking-[0.2em] text-champagne mb-3 font-bold">✦ Recomendado</p>}
+              <p className="font-bold text-lg">{t.name}</p>
+              <p className="font-black text-4xl mt-2 mb-1">{t.price}</p>
+              <p className="text-xs text-paper/40 mb-6">{t.desc}</p>
+              <ul className="space-y-2.5 text-sm text-paper/60 flex-1">
+                {t.feats.map(f => (
+                  <li key={f} className="flex items-center gap-2">
+                    <span className="text-champagne/70 text-xs">✓</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={() => onCTA(t.name)}
+                      className={`mt-7 rounded-full py-3 text-sm font-bold transition ${t.popular ? 'bg-paper text-ink hover:bg-white' : 'border border-white/15 hover:border-white/40 hover:text-paper'}`}>
+                Crear mi evento
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ── FAQ ── */
+const FAQ = () => {
+  const [open, setOpen] = useState(-1);
+  const qs = [
+    ['¿Mis invitados tienen que descargar algo?', 'No. Escanean el QR, escriben su nombre y ya están adentro. Diez segundos.'],
+    ['¿Qué pasa si la señal del local es mala?', 'Las fotos se guardan en el celular y suben solas cuando vuelve la conexión. No se pierde ninguna.'],
+    ['¿Pueden subir fotos después de la fiesta?', 'Sí, hasta 30 días después de la fiesta.'],
+    ['¿Alguien ve las fotos antes del revelado?', 'Nadie. Ni ustedes. Esa es la gracia.'],
+    ['¿Y si alguien sube una foto que no queremos?', 'Ustedes revisan y deciden antes de que el álbum quede final.'],
+    ['¿En qué países funciona?', 'Lanzamos en Perú. Próximamente Chile y Colombia.'],
+  ];
+  return (
+    <section id="faq" className="py-24 px-6 border-t border-white/5 bg-smoke/40">
+      <div className="mx-auto max-w-2xl">
+        <div className="text-center mb-12">
+          <p className="text-xs uppercase tracking-[0.25em] text-champagne/80 mb-3">FAQ</p>
+          <h2 className="text-3xl sm:text-4xl font-black">Preguntas frecuentes</h2>
+        </div>
+        <div className="divide-y divide-white/5 border-y border-white/5">
+          {qs.map(([q, a], i) => (
+            <div key={q}>
+              <button onClick={() => setOpen(open === i ? -1 : i)}
+                      className="w-full flex items-center justify-between gap-4 py-5 text-left">
+                <span className="text-sm font-semibold">{q}</span>
+                <span className={`text-champagne font-bold text-lg flex-shrink-0 transition-transform duration-200 ${open === i ? 'rotate-45' : ''}`}>+</span>
+              </button>
+              {open === i && <p className="pb-5 text-sm text-paper/60 leading-relaxed">{a}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ── Closing CTA ── */
+const Cierre = ({ onCTA }) => (
+  <footer className="py-28 px-6 border-t border-white/5">
+    <div className="mx-auto max-w-3xl text-center">
+      <h2 className="font-black text-4xl sm:text-6xl leading-tight">
+        5 minutos. Un QR.<br/>
+        <span className="font-serif italic font-normal text-champagne">El álbum completo de tu boda.</span>
+      </h2>
+      <p className="mt-6 text-paper/50 max-w-md mx-auto">
+        La fiesta pasa una sola vez. No dejes que las fotos se queden en celulares ajenos.
+      </p>
+      <button onClick={() => onCTA('general')}
+              className="inline-block mt-10 rounded-full bg-paper text-ink font-bold px-10 py-4 hover:bg-white transition text-base">
+        Crear mi evento
+      </button>
+
+      <div className="mt-20 pt-10 border-t border-white/5">
+        <p className="text-sm text-paper/50">¿Eres wedding planner o fotógrafo? <span className="text-paper font-semibold">Hablemos.</span></p>
+        <p className="text-xs text-paper/30 mt-1">Estamos buscando partners en Perú.</p>
+        <a href="https://wa.me/51999999999?text=Hola,%20soy%20wedding%20planner%20y%20quiero%20saber%20m%C3%A1s%20de%20LoDeAyer"
+           target="_blank"
+           className="inline-block mt-5 rounded-full border border-white/15 px-7 py-3 text-sm hover:border-white/40 transition">
+          Escríbenos por WhatsApp
+        </a>
+      </div>
+
+      <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-xs text-paper/20">
+        <span className="font-black text-paper/30">LoDeAyer</span>
+        <span>Lima, Perú</span>
+        <span>Fotos: <a href="https://www.pexels.com" target="_blank" className="underline hover:text-paper/40">Pexels</a></span>
+        <a href="#" className="hover:text-paper/40">Privacidad</a>
+        <a href="#" className="hover:text-paper/40">Términos</a>
+      </div>
+    </div>
+  </footer>
+);
+
+/* ── Floating QR Widget ── */
+const FakeQR = ({ size = 72 }) => {
+  const n = 13, cells = [];
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    const corner = (i < 4 && j < 4) || (i < 4 && j > n - 5) || (i > n - 5 && j < 4);
+    const on = corner ? ((i % 3 !== 1 || j % 3 !== 1) ? 1 : 0) : ((i * 7 + j * 13 + i * j) % 5 < 2 ? 1 : 0);
+    if (on) cells.push(<rect key={i+'-'+j} x={j} y={i} width="0.92" height="0.92" fill="#0b0b0c" />);
+  }
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${n} ${n}`} className="rounded-lg bg-white p-[2px] flex-shrink-0">
+      {cells}
+    </svg>
+  );
+};
+
+const QRWidget = ({ onCTA }) => (
+  <div className="hidden md:flex fixed bottom-6 left-6 z-40 items-center gap-3 rounded-2xl border border-white/10 bg-smoke/90 backdrop-blur px-4 py-3.5 shadow-2xl cursor-pointer hover:border-white/20 transition max-w-[260px]"
+       onClick={() => onCTA('general')}>
+    <FakeQR />
+    <div>
+      <p className="text-[13px] font-bold leading-snug">Pruébalo ahora.</p>
+      <p className="text-[11px] text-paper/50 leading-snug mt-0.5">Tu cámara lista. Sin descargar nada.</p>
+    </div>
+  </div>
+);
+
+/* ── App ── */
+const App = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedTier, setSelectedTier] = useState('');
+
+  const openModal = tier => {
+    setSelectedTier(tier);
+    setModalOpen(true);
+  };
+
+  return (
+    <main>
+      <Nav onCTA={openModal} />
+      <Hero onCTA={openModal} />
+      <Marquee />
+      <BentoGrid />
+      <Problema />
+      <ComoFunciona onCTA={openModal} />
+      <Revelado />
+      <Stats />
+      <LoQueRecibes />
+      <Pricing onCTA={openModal} />
+      <FAQ />
+      <Cierre onCTA={openModal} />
+      <QRWidget onCTA={openModal} />
+      <Modal open={modalOpen} tier={selectedTier} onClose={() => setModalOpen(false)} />
+    </main>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
