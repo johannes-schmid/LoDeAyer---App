@@ -1,20 +1,53 @@
 # LoDeAyer — Project CLAUDE.md
 
 ## Dev server
-No dev server — static HTML files opened directly in Chrome.
+The project lives entirely in `lodeayer-app/`. All work happens there.
+
+```bash
+cd "/Users/johannesschmid/Desktop/Development Project/LoDeAyer/lodeayer-app"
+npm run dev
 ```
-open -a "Google Chrome" "/Users/johannesschmid/Desktop/Development Project/Photo_App/experiencia.html"
-open -a "Google Chrome" "/Users/johannesschmid/Desktop/Development Project/Photo_App/problema.html"
-```
+
+> **Note:** Requires Node v18+. Use your terminal (not Claude's shell) if Claude's shell defaults to Node v14. Check with `node --version`.
+
+Open in Chrome:
+- Landing page: `open -a "Google Chrome" http://localhost:3000`
+- Guest demo: `open -a "Google Chrome" http://localhost:3000/evento/demo`
+- Organizer demo: `open -a "Google Chrome" http://localhost:3000/organizer`
 
 ---
 
 ## Directory map
+
 ```
-Photo_App/
-├── problema.html     # Landing page v1 — "El problema" angle (photo sharing pain)
-├── experiencia.html  # Landing page v2 — "La experiencia" angle (disposable camera / revelado)
-└── CLAUDE.md
+lodeayer-app/
+├── app/
+│   ├── page.tsx                  # Marketing landing page
+│   ├── layout.tsx                # Root layout (fonts, metadata)
+│   ├── globals.css               # Tailwind + custom keyframes (scan-line, marquee)
+│   ├── evento/[slug]/page.tsx    # Guest mobile flow (welcome → name → carrete → scan → success → vote → reveal)
+│   └── organizer/page.tsx        # Couple flow (landing → create 1-3 → dashboard → curation → gallery → prize)
+├── components/
+│   ├── guest/
+│   │   ├── WelcomeScreen.tsx     # Event hero + stats
+│   │   ├── NameScreen.tsx        # Name + WhatsApp entry
+│   │   ├── CarreteScreen.tsx     # Upload zone + film strip + top-20 hint
+│   │   ├── ScanScreen.tsx        # Fake AI quality scan (nitidez, exposición, contenido)
+│   │   ├── SuccessScreen.tsx     # Upload confirmed + shots remaining
+│   │   ├── VoteScreen.tsx        # Vote for best photo grid
+│   │   └── RevealScreen.tsx      # Morning reveal — winner + photo gallery by moment
+│   ├── organizer/
+│   │   ├── OrgLanding.tsx        # Couple sign-in / product overview
+│   │   ├── CreateStep1.tsx       # Event info (names, date, venue, city, reveal time)
+│   │   ├── CreateStep2.tsx       # Settings (max photos, moments, prize, voting rules, sharing)
+│   │   ├── CreateStep3.tsx       # Plan selection + summary + pay CTA
+│   │   ├── OrgDashboard.tsx      # Live stats + QR code + activity feed
+│   │   ├── CurationScreen.tsx    # Photo curation grid (select/deselect for album)
+│   │   ├── GalleryVoteScreen.tsx # Public gallery + per-photo voting + sharing
+│   │   └── PrizeScreen.tsx       # Winner announcement + WhatsApp notify CTA
+│   ├── landing/                  # Marketing landing page sections
+│   └── ui/                       # shadcn/ui primitives
+└── lib/                          # Utilities
 ```
 
 ---
@@ -33,28 +66,14 @@ Photo_App/
 
 **The solution:**
 - QR code at each table → guests open a web link (no app download)
-- Enter name only → no account, no friction
-- Upload photos during or after the event (30-day window)
+- Enter name + WhatsApp → no account, no friction
+- Upload top-20 photos during or after the event
+- AI quality scan on each upload (blur, exposure, content check)
 - Next-day "Revelado" — all photos revealed at once via WhatsApp
 - Organized album by event moment (ceremony, cocktail, party)
-- Gamification: points per photo uploaded, vote for best photo, winner announced
-- Couples control: review and approve before album is finalized
-
----
-
-## Two concepts now merged into one product
-
-**Concept A — Sharing/collection** (`problema.html`):
-- Emphasis on solving the "photos never arrive" problem
-- Album organized by moment, download in one click
-- Works like a structured collection tool
-
-**Concept B — Disposable camera / Revelado** (`experiencia.html`):
-- Limited shots per person (carrete, 10–30 configurable)
-- Film aesthetic, surprise reveal next morning
-- Sealed until reveal time chosen by the couple
-
-**Decision: Merge both into one final landing page.** Research best practices for combining the two angles. The Revelado experience is a toggleable feature, not a separate product.
+- Couple curates the album before publishing
+- Guests vote for best photo; winner gets a prize chosen by the couple
+- Couple notifies winner via WhatsApp
 
 ---
 
@@ -72,8 +91,7 @@ Photo_App/
 ## Business model
 
 - **One-time payment per event** (not subscription)
-- **Target pricing**: ~$30–$89 per event (competitor benchmark: ~$30)
-- **Tiers shown on pages** (draft, may adjust):
+- **Tiers:**
   - Prueba: $0 — up to 15 guests, 10 photos/person
   - Fiesta: $49 — up to 50 guests
   - Boda: $89 — up to 150 guests (recommended)
@@ -84,14 +102,10 @@ Photo_App/
 
 ## Tech stack
 
-### Current state (landing pages)
-Static HTML + Tailwind CDN + React via Babel in-browser. Temporary — move to the stack below when building the real product.
-
-### Target stack (default)
 | Layer | Tool |
 |-------|------|
-| Framework | Next.js (App Router) |
-| UI | React + Tailwind CSS + shadcn/ui |
+| Framework | Next.js 16 (App Router) |
+| UI | React + Tailwind CSS v4 + shadcn/ui |
 | Database + Auth | Supabase (Postgres + Supabase Auth) |
 | Storage | Supabase Storage (images) |
 | Hosting | Vercel (frontend + API routes) |
@@ -102,33 +116,36 @@ Static HTML + Tailwind CDN + React via Babel in-browser. Temporary — move to t
 | Analytics | Mixpanel (product) + Google Analytics (traffic) |
 | Session recording | Microsoft Clarity |
 | Error tracking | Sentry |
-| Path alias | `@/*` → project root (`jsconfig.json`) |
+| Path alias | `@/*` → project root |
 | Mobile (future) | Expo |
 
 ### Known constraints
 - Images average ~10MB each; 200 guests × 20 photos ≈ 40GB per large wedding — storage cost is a key unit economic to track
-- Supabase Storage confirmed viable; compression/optimization needed before storing (use squash or equivalent)
-- Web-first (mobile browser) — no native app for MVP; App Clips and Android instant apps explored but deprioritized
+- Supabase Storage confirmed viable; compression/optimization needed before storing
+- Web-first (mobile browser) — no native app for MVP
 
 ---
 
 ## MVP scope (agreed)
 
-1. Couple creates event (web)
+1. Couple creates event (web) — 3-step form, plan selection
 2. QR code / share link generated
-3. Guests open link → enter name → upload photos (no login)
-4. WhatsApp reminders to upload (couple provides guest phone numbers)
-5. Reveal: next-day gallery unlocked, sent via WhatsApp
-6. Guests vote for best photo; winner announced to group
-7. Couple reviews → approves final album → download
+3. Guests open link → enter name + WhatsApp → upload photos (no login)
+4. AI quality scan per photo (client-side simulation; real AI in production)
+5. WhatsApp reminders to upload (couple provides guest phone numbers)
+6. Couple curates album — selects which photos go public
+7. Reveal: next-day gallery unlocked, sent via WhatsApp
+8. Guests vote for best photo; winner announced to group
+9. Couple assigns prize → WhatsApp notification to winner
+10. Couple + guests download album
 
 **Not in MVP**: AI photo classification, live projection at event, video, face recognition grouping
 
 ---
 
-## UI verification — screenshot loop
+## UI verification
 
-After every UI change, verify visually using Puppeteer before reporting done. Run this pattern:
+After every UI change, verify at localhost:3000 in Chrome. Use Puppeteer if needed:
 
 ```bash
 node -e "
@@ -136,19 +153,14 @@ const puppeteer = require('puppeteer');
 (async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  await page.setViewport({ width: 1280, height: 900 });
-  await page.goto('http://localhost:3000'); // or file:// path for static HTML
+  await page.setViewport({ width: 430, height: 900 });
+  await page.goto('http://localhost:3000/evento/demo');
   await page.waitForTimeout(2000);
   await page.screenshot({ path: '/tmp/screenshot.png', fullPage: true });
   await browser.close();
-  console.log('Screenshot saved to /tmp/screenshot.png');
 })();
 "
 ```
-
-Then read `/tmp/screenshot.png` to visually confirm the change looks correct. Repeat after each meaningful change — do not declare done without having seen a screenshot. For static HTML files use `file:///absolute/path/to/file.html` as the URL.
-
-Install Puppeteer if not present: `npm install puppeteer`
 
 ---
 
@@ -156,13 +168,15 @@ Install Puppeteer if not present: `npm install puppeteer`
 
 | Date | What happened |
 |------|--------------|
-| 2026-06-21 | Both HTML pages were blank — Babel's new default JSX runtime emits `import` statements, crashing in a plain `<script>` tag. Fixed by registering a `react-classic` preset and pointing `text/babel` at it. |
-| 2026-06-21 | Decision made: merge two landing pages into one final page. |
+| 2026-06-21 | Static HTML pages were blank — Babel JSX runtime issue. Fixed. |
+| 2026-06-21 | Decision: merge two landing page angles into one product. |
+| 2026-06-22 | Migrated all work to Next.js app (`lodeayer-app/`). Deleted static HTML files. Full guest flow (7 screens) and organizer flow (8 screens) built in React/Tailwind. |
 
 ---
 
 ## Next steps
-1. Research best practices for combining "problem-agitation" + "experience/ritual" angles on a single landing page
-2. Build merged final landing page
-3. Share with target audience in Peru for feedback
-4. Begin MVP build (Supabase + Next.js)
+1. Start dev server and verify both flows visually in browser
+2. Wire up Supabase (schema: events, guests, photos, votes)
+3. Add real file upload to Supabase Storage with client-side compression
+4. Stripe payment integration on CreateStep3
+5. WhatsApp API integration for reveal + winner notification
