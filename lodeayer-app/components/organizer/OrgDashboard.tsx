@@ -154,7 +154,7 @@ function InicioTab({ onCurate }: { onCurate: () => void }) {
       <div className="bg-[#111113] border border-white/[0.06] rounded-2xl p-5">
         <p className="text-[11px] uppercase tracking-widest text-[#f4efe7]/30 mb-4 text-center">Código QR del evento</p>
         <div className="flex justify-center mb-4">
-          <a href="/demo" target="_blank" rel="noopener noreferrer" className="w-32 h-32 bg-white rounded-xl flex items-center justify-center p-2.5 hover:ring-2 hover:ring-[#d9b98a]/60 transition-all">
+          <a href="/demo" className="w-32 h-32 bg-white rounded-xl flex items-center justify-center p-2.5 hover:ring-2 hover:ring-[#d9b98a]/60 transition-all cursor-pointer">
             <svg viewBox="0 0 41 41" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
               <rect width="41" height="41" fill="white"/>
               <rect x="1" y="1" width="7" height="7" fill="black"/><rect x="2" y="2" width="5" height="5" fill="white"/><rect x="3" y="3" width="3" height="3" fill="black"/>
