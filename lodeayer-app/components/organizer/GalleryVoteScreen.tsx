@@ -2,16 +2,25 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-const PHOTOS = [
-  { src: "https://images.pexels.com/photos/636006/pexels-photo-636006.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Rodrigo M.", moment: "💒 Ceremonia", votes: 23 },
-  { src: "https://images.pexels.com/photos/15964956/pexels-photo-15964956.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Lucía P.", moment: "🥂 Cocktail", votes: 17 },
-  { src: "https://images.pexels.com/photos/15964962/pexels-photo-15964962.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Camila V.", moment: "🎶 Baile", votes: 14 },
-  { src: "https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Martín O.", moment: "🍽️ Cena", votes: 9 },
-  { src: "https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Sofía R.", moment: "🎶 Baile", votes: 8 },
-  { src: "https://images.pexels.com/photos/1024966/pexels-photo-1024966.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Valeria S.", moment: "💒 Ceremonia", votes: 6 },
+const AVATAR_COLORS = [
+  "from-rose-400 to-pink-600",
+  "from-sky-400 to-blue-600",
+  "from-violet-400 to-purple-600",
+  "from-emerald-400 to-teal-600",
+  "from-amber-400 to-orange-500",
+  "from-fuchsia-400 to-pink-500",
 ];
 
-const RANKS = ["👑 #1", "🥈 #2", "🥉 #3"];
+const PHOTOS = [
+  { src: "https://images.pexels.com/photos/636006/pexels-photo-636006.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Rodrigo M.", init: "R", moment: "Ceremonia", votes: 23 },
+  { src: "https://images.pexels.com/photos/15964956/pexels-photo-15964956.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Lucía P.", init: "L", moment: "Cocktail", votes: 17 },
+  { src: "https://images.pexels.com/photos/15964962/pexels-photo-15964962.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Camila V.", init: "C", moment: "Baile", votes: 14 },
+  { src: "https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Martín O.", init: "Ma", moment: "Cena", votes: 9 },
+  { src: "https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Sofía R.", init: "S", moment: "Baile", votes: 8 },
+  { src: "https://images.pexels.com/photos/1024966/pexels-photo-1024966.jpeg?auto=compress&cs=tinysrgb&h=400&w=400", author: "Valeria S.", init: "V", moment: "Ceremonia", votes: 6 },
+];
+
+const RANKS = ["#1", "#2", "#3"];
 
 interface GalleryVoteScreenProps {
   onSeePrize: () => void;
@@ -28,7 +37,7 @@ export default function GalleryVoteScreen({ onSeePrize, onBack }: GalleryVoteScr
       <div className="px-5 pt-10 pb-5 bg-gradient-to-b from-[#d9b98a]/[0.04] to-transparent">
         <div className="flex items-center justify-between mb-3">
           <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
-            <span className="text-green-400 text-[11px] font-semibold">🎞️ Álbum publicado</span>
+            <span className="text-green-400 text-[11px] font-semibold">Álbum publicado</span>
           </div>
           <span className="text-[#f4efe7]/30 text-xs">15 nov · 9:02 am</span>
         </div>
@@ -37,10 +46,10 @@ export default function GalleryVoteScreen({ onSeePrize, onBack }: GalleryVoteScr
 
         <div className="flex gap-2">
           <Button onClick={onSeePrize} className="flex-1 bg-[#d9b98a] text-[#0b0b0c] font-semibold rounded-xl h-11 hover:bg-[#c9a070] text-sm">
-            Ver ganador 🏆
+            Ver ganador
           </Button>
           <button
-            onClick={() => alert("📤 Link del álbum copiado")}
+            onClick={() => alert("Link del álbum copiado")}
             className="px-4 h-11 rounded-xl border border-white/[0.09] bg-[#111113] text-[#f4efe7]/60 text-sm font-medium hover:text-[#f4efe7]/90 transition-colors"
           >
             Compartir
@@ -67,9 +76,14 @@ export default function GalleryVoteScreen({ onSeePrize, onBack }: GalleryVoteScr
                 )}
                 <img src={p.src} alt={p.author} className="w-full aspect-square object-cover block" loading="lazy" />
               </div>
-              <div className="bg-[#111113] px-3 pt-2 pb-1">
-                <p className="text-xs font-semibold text-[#f4efe7]/80">{p.author}</p>
-                <p className="text-[10px] text-[#f4efe7]/35 mt-0.5">{p.moment}</p>
+              <div className="bg-[#111113] px-3 pt-2.5 pb-1 flex items-center gap-2">
+                <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center font-bold text-white text-[9px] shrink-0`}>
+                  {p.init}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-[#f4efe7]/80 truncate">{p.author}</p>
+                  <p className="text-[10px] text-[#f4efe7]/35">{p.moment}</p>
+                </div>
               </div>
               <div className="bg-[#111113] px-3 pb-3 flex items-center justify-between">
                 <button
@@ -83,7 +97,7 @@ export default function GalleryVoteScreen({ onSeePrize, onBack }: GalleryVoteScr
                   {voted ? "♥" : "♡"} {count}
                 </button>
                 <button
-                  onClick={() => alert("📤 Foto compartida!")}
+                  onClick={() => alert("Foto compartida!")}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-white/[0.09] text-xs text-[#f4efe7]/40 hover:text-[#f4efe7]/70 transition-colors"
                 >
                   ↗ Compartir

@@ -55,6 +55,7 @@ export default function EventoPage() {
                 name={guestName}
                 uploadedPhotos={uploadedPhotos}
                 onPhotoUpload={handlePhotoSelected}
+                onVote={() => setScreen("vote")}
               />
             )}
             {s === "scan" && (

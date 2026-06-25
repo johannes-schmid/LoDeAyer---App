@@ -9,22 +9,29 @@ export default function OrgLanding({ onCreate, onDemo }: OrgLandingProps) {
   return (
     <div className="flex flex-col h-full px-6 py-12">
       <div className="flex-1 flex flex-col items-center justify-center text-center">
-        <div className="text-5xl mb-6">💍</div>
         <p className="font-serif italic text-[#d9b98a] text-2xl mb-1">LoDeAyer</p>
-        <p className="text-[#f4efe7]/35 text-sm tracking-wide mb-12">Panel de novios</p>
+        <p className="text-[#f4efe7]/35 text-sm tracking-wide mb-12">Panel de organización</p>
 
         <div className="w-full bg-[#111113] border border-white/[0.06] rounded-2xl p-5 mb-8 text-left space-y-3">
           <p className="text-[#f4efe7]/35 text-[11px] uppercase tracking-widest mb-4">Lo que incluye tu evento</p>
           {[
-            ["📸", "QR en cada mesa — sin app ni cuenta"],
-            ["🎞️", "Revelado al día siguiente por WhatsApp"],
-            ["🗳️", "Votación + premio para la mejor foto"],
-            ["📥", "Álbum descargable en alta calidad"],
-          ].map(([icon, text], i) => (
+            "QR en cada mesa — sin app ni cuenta",
+            "Revelado al día siguiente por WhatsApp",
+            "Votación + premio para la mejor foto",
+            "Álbum descargable en alta calidad",
+          ].map((text, i) => (
             <div key={i} className="flex items-center gap-3 text-sm">
-              <span>{icon}</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#d9b98a]/50 shrink-0" />
               <span className="text-[#f4efe7]/70">{text}</span>
             </div>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-2 justify-center pt-2">
+          {["Bodas", "Baby Showers", "Quinceañeras", "Fiestas"].map((tag) => (
+            <span key={tag} className="text-xs text-[#f4efe7]/35 bg-white/[0.04] border border-white/[0.07] rounded-full px-3 py-1">
+              {tag}
+            </span>
           ))}
         </div>
       </div>

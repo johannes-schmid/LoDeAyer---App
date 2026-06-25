@@ -1,7 +1,12 @@
 "use client";
+import { useState } from "react";
+import { format, parse, isValid } from "date-fns";
+import { es } from "date-fns/locale";
+import { CalendarIcon, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export interface EventInfo {
   partner1: string;
@@ -32,8 +37,18 @@ function StepBar({ active }: { active: number }) {
 export { StepBar };
 
 export default function CreateStep1({ data, onChange, onNext, onBack }: CreateStep1Props) {
+  const [calOpen, setCalOpen] = useState(false);
+
   const set = (k: keyof EventInfo) => (e: React.ChangeEvent<HTMLInputElement>) =>
     onChange({ ...data, [k]: e.target.value });
+
+  const selectedDate = data.date ? parse(data.date, "yyyy-MM-dd", new Date()) : undefined;
+  const validDate = selectedDate && isValid(selectedDate) ? selectedDate : undefined;
+
+  const handleDaySelect = (day: Date | undefined) => {
+    onChange({ ...data, date: day ? format(day, "yyyy-MM-dd") : "" });
+    setCalOpen(false);
+  };
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
@@ -57,8 +72,33 @@ export default function CreateStep1({ data, onChange, onNext, onBack }: CreateSt
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-[11px] uppercase tracking-widest text-[#f4efe7]/35 block mb-2">Fecha</label>
-            <Input type="date" value={data.date} onChange={set("date")}
-              className="bg-[#111113] border-white/[0.08] text-[#f4efe7] h-14 rounded-2xl focus-visible:ring-[#d9b98a]/30 focus-visible:border-[#d9b98a]/40" />
+            <Popover open={calOpen} onOpenChange={setCalOpen}>
+              <PopoverTrigger className="w-full h-14 rounded-2xl bg-[#111113] border border-white/[0.08] px-4 flex items-center justify-between text-sm transition-colors hover:border-white/[0.15] focus:outline-none focus:border-[#d9b98a]/40 focus:ring-[3px] focus:ring-[#d9b98a]/10">
+                <span className={validDate ? "text-[#f4efe7]" : "text-[#f4efe7]/20"}>
+                  {validDate ? format(validDate, "d MMM yyyy", { locale: es }) : "Elige fecha"}
+                </span>
+                <CalendarIcon className="w-4 h-4 text-[#f4efe7]/30 shrink-0" />
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto p-0 bg-[#111113] border-white/[0.10] rounded-2xl shadow-2xl"
+                align="start"
+                sideOffset={6}
+              >
+                <Calendar
+                  mode="single"
+                  selected={validDate}
+                  onSelect={handleDaySelect}
+                  locale={es}
+                  classNames={{
+                    root: "bg-[#111113] text-[#f4efe7] p-3 rounded-2xl",
+                    month_caption: "text-[#f4efe7] text-sm font-medium",
+                    weekday: "text-[#f4efe7]/30 text-[11px]",
+                    outside: "text-[#f4efe7]/15",
+                    disabled: "text-[#f4efe7]/15 opacity-40",
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <div>
             <label className="text-[11px] uppercase tracking-widest text-[#f4efe7]/35 block mb-2">Hora revelado</label>

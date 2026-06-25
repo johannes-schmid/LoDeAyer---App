@@ -25,10 +25,10 @@ const ALL_PHOTOS = [
 
 const FILTERS = [
   { val: "all", label: `Todas (${ALL_PHOTOS.length})` },
-  { val: "ceremonia", label: "💒 Ceremonia" },
-  { val: "cocktail", label: "🥂 Cocktail" },
-  { val: "baile", label: "🎶 Baile" },
-  { val: "cena", label: "🍽️ Cena" },
+  { val: "ceremonia", label: "Ceremonia" },
+  { val: "cocktail", label: "Cocktail" },
+  { val: "baile", label: "Baile" },
+  { val: "cena", label: "Cena" },
 ];
 
 interface CurationScreenProps {
@@ -41,6 +41,7 @@ export default function CurationScreen({ onPublish, onBack }: CurationScreenProp
     () => new Set(ALL_PHOTOS.map((p, i) => p.sel ? i : -1).filter(i => i >= 0))
   );
   const [filter, setFilter] = useState("all");
+  const [consent, setConsent] = useState(false);
 
   const toggle = (i: number) => {
     setSelected(prev => {
@@ -63,23 +64,25 @@ export default function CurationScreen({ onPublish, onBack }: CurationScreenProp
   const visible = ALL_PHOTOS.map((p, i) => ({ p, i })).filter(({ p }) => filter === "all" || p.moment === filter);
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
-      <div className="px-5 pt-10 pb-4 border-b border-white/[0.05]">
-        <p className="text-[#f4efe7]/35 text-[11px] uppercase tracking-widest mb-1">Selección de fotos · Revelado</p>
-        <h2 className="text-2xl font-bold tracking-tight mb-1">Curar el álbum</h2>
-        <p className="text-[#f4efe7]/40 text-sm">Elige las fotos que van al álbum público.</p>
-      </div>
+    <div className="flex flex-col h-full">
+      {/* Sticky header */}
+      <div className="shrink-0">
+        <div className="px-5 pt-10 pb-4 border-b border-white/[0.05]">
+          <p className="text-[#f4efe7]/35 text-[11px] uppercase tracking-widest mb-1">Selección de fotos · Revelado</p>
+          <h2 className="text-2xl font-bold tracking-tight mb-1">Curar el álbum</h2>
+          <p className="text-[#f4efe7]/40 text-sm">Elige las fotos que van al álbum público.</p>
+        </div>
 
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.05] sticky top-0 bg-[#0b0b0c]/95 backdrop-blur-sm z-10">
-        <span className="text-[#d9b98a] text-sm font-semibold">{selected.size} foto{selected.size !== 1 ? "s" : ""} seleccionada{selected.size !== 1 ? "s" : ""}</span>
-        <button onClick={toggleAll} className="text-[#f4efe7]/40 text-xs hover:text-[#f4efe7]/70 transition-colors">
-          {visible.every(({ i }) => selected.has(i)) ? "Deseleccionar todas" : "Seleccionar todas"}
-        </button>
-      </div>
+        {/* Toolbar */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.05]">
+          <span className="text-[#d9b98a] text-sm font-semibold">{selected.size} foto{selected.size !== 1 ? "s" : ""} seleccionada{selected.size !== 1 ? "s" : ""}</span>
+          <button onClick={toggleAll} className="text-[#f4efe7]/40 text-xs hover:text-[#f4efe7]/70 transition-colors">
+            {visible.every(({ i }) => selected.has(i)) ? "Deseleccionar todas" : "Seleccionar todas"}
+          </button>
+        </div>
 
-      {/* Filter row */}
-      <div className="flex gap-2 px-5 py-3 overflow-x-auto scrollbar-none">
+        {/* Filter row */}
+        <div className="flex gap-2 px-5 py-3 overflow-x-auto scrollbar-none border-b border-white/[0.05]">
         {FILTERS.map(f => (
           <button
             key={f.val}
@@ -93,10 +96,13 @@ export default function CurationScreen({ onPublish, onBack }: CurationScreenProp
             {f.label}
           </button>
         ))}
-      </div>
+        </div>
+      </div>{/* end sticky header */}
 
+      {/* Scrollable area */}
+      <div className="flex-1 overflow-y-auto">
       {/* Photo grid */}
-      <div className="grid grid-cols-3 gap-[3px] px-5 pb-2">
+      <div className="grid grid-cols-3 gap-[3px] px-5 pb-2 pt-2">
         {visible.map(({ p, i }) => {
           const isSel = selected.has(i);
           return (
@@ -114,11 +120,27 @@ export default function CurationScreen({ onPublish, onBack }: CurationScreenProp
         })}
       </div>
 
-      <div className="px-5 pt-4 pb-10 space-y-3">
+      </div>{/* end scrollable area */}
+
+      <div className="px-5 pt-4 pb-10 space-y-3 shrink-0">
         <p className="text-[#f4efe7]/25 text-xs text-center">Las fotos seleccionadas se envían a todos los invitados por WhatsApp a las 9:00 am</p>
+
+        {/* Consent */}
+        <button
+          onClick={() => setConsent(c => !c)}
+          className="w-full flex items-start gap-3 bg-[#111113] border border-white/[0.07] rounded-2xl px-4 py-4 text-left"
+        >
+          <div className={`mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${consent ? "bg-[#d9b98a] border-[#d9b98a]" : "border-white/25 bg-transparent"}`}>
+            {consent && <span className="text-[#0b0b0c] text-[10px] font-black">✓</span>}
+          </div>
+          <p className="text-[#f4efe7]/50 text-xs leading-relaxed">
+            Confirmo que todos los invitados han dado su <span className="text-[#f4efe7]/80 font-semibold">consentimiento</span> para que sus fotos se incluyan en el álbum compartido.
+          </p>
+        </button>
+
         <Button
           onClick={onPublish}
-          disabled={selected.size === 0}
+          disabled={selected.size === 0 || !consent}
           className="w-full bg-[#d9b98a] text-[#0b0b0c] font-semibold h-14 rounded-2xl hover:bg-[#c9a070] disabled:opacity-30"
         >
           Publicar álbum ({selected.size} fotos)

@@ -8,7 +8,6 @@ interface WelcomeScreenProps {
 export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
   return (
     <div className="flex flex-col h-full">
-      {/* Hero image */}
       <div className="relative flex-shrink-0 h-[55%]">
         <img
           src="https://images.pexels.com/photos/15964956/pexels-photo-15964956.jpeg?auto=compress&cs=tinysrgb&h=900&w=600"
@@ -24,43 +23,50 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col px-6 pt-4 pb-8 bg-[#0b0b0c]">
-        <h1 className="font-serif italic text-[1.65rem] text-[#f4efe7] text-center leading-tight mb-1">
-          Boda de Ana & Carlos
-        </h1>
-        <p className="text-[#f4efe7]/35 text-xs text-center mb-5">Lima · 21 de Junio, 2026</p>
+      <div className="flex-1 flex flex-col px-6 pt-5 pb-8 bg-[#0b0b0c]">
+        <div className="text-center mb-1">
+          <p className="text-[11px] uppercase tracking-[0.12em] text-[#8a8a8a] mb-1">
+            Boda de
+          </p>
+          <h2 className="font-serif italic text-3xl font-light leading-tight text-[#f4efe7]">
+            Ana &amp; Carlos
+          </h2>
+        </div>
+        <p className="text-[#8a8a8a] text-xs text-center mt-1 mb-6">
+          Lima &middot; 21 de Junio, 2026
+        </p>
 
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           {[
-            { val: "287", label: "fotos" },
-            { val: "34", label: "personas" },
-            { val: "9h", label: "revelado" },
+            { val: "287", label: "Fotos" },
+            { val: "34", label: "Personas" },
+            { val: "9h", label: "Revelado" },
           ].map((s, i) => (
-            <div key={i} className="bg-[#111113] border border-white/[0.06] rounded-2xl p-3 text-center">
-              <p className="text-[#d9b98a] font-semibold text-lg leading-none">{s.val}</p>
-              <p className="text-[#f4efe7]/35 text-[10px] mt-1.5">{s.label}</p>
+            <div key={i} className="bg-[#141416] ring-1 ring-white/[0.08] rounded-2xl p-4 text-center">
+              <p className="text-2xl font-bold tabular-nums text-[#d9b98a]">{s.val}</p>
+              <p className="text-[10px] uppercase tracking-[0.1em] text-[#8a8a8a] mt-1.5">{s.label}</p>
             </div>
           ))}
         </div>
 
-        {/* Carrete pill */}
-        <div className="flex items-center gap-2.5 bg-[#111113] border border-white/[0.06] rounded-full px-4 py-2.5 mb-5 self-center">
-          <Film className="w-3.5 h-3.5 text-[#d9b98a]/60" />
-          <div className="flex gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className={`w-2 h-2 rounded-full ${i < 3 ? "bg-[#d9b98a]" : "bg-white/15"}`} />
+        <div className="flex items-center gap-3 bg-[#141416] ring-1 ring-white/[0.08] rounded-2xl px-4 py-3 mb-6 w-full">
+          <Film className="w-3.5 h-3.5 text-[#d9b98a]/60 shrink-0" />
+          <div className="flex gap-[2px] flex-1">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className={`flex-1 h-[3px] rounded-full ${i < 14 ? "bg-[#d9b98a]" : "bg-white/[0.06]"}`}
+              />
             ))}
           </div>
-          <span className="text-[#f4efe7]/50 text-xs">20 disparos · carrete</span>
+          <span className="text-[#8a8a8a] text-[11px] shrink-0">20 disparos</span>
         </div>
 
         <div className="flex-1" />
 
         <Button
           onClick={onNext}
-          className="w-full bg-[#d9b98a] text-[#0b0b0c] font-semibold h-14 rounded-2xl text-base hover:bg-[#c9a070] flex items-center justify-center gap-2"
+          className="w-full h-12 rounded-2xl text-sm font-medium tracking-wide bg-[#d9b98a] text-[#0b0b0c] hover:bg-[#d9b98a]/90 flex items-center justify-center gap-2"
         >
           Unirme al evento <ArrowRight className="w-4 h-4" />
         </Button>

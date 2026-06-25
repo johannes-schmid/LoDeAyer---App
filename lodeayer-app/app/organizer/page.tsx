@@ -14,7 +14,7 @@ type Screen = "landing" | "step1" | "step2" | "step3" | "dashboard" | "curation"
 const ALL_SCREENS: Screen[] = ["landing", "step1", "step2", "step3", "dashboard", "curation", "gallery", "prize"];
 
 const DEFAULT_INFO: EventInfo = { partner1: "", partner2: "", date: "2025-11-14", revealTime: "09:00", venue: "", city: "" };
-const DEFAULT_SETTINGS: EventSettings = { maxPhotos: 20, moments: ["ceremonia", "cocktail", "cena", "baile"], prize: "Botella de champagne Moët", votingOpen: "guests", allowSharing: true };
+const DEFAULT_SETTINGS: EventSettings = { maxPhotos: 20, unlimitedPhotos: false, moments: ["ceremonia", "cocktail", "cena", "baile"], prize: "Botella de champagne Moët", votingOpen: "guests", allowSharing: true };
 
 export default function OrganizerPage() {
   const [screen, setScreen] = useState<Screen>("landing");

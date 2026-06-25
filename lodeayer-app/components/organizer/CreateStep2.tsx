@@ -7,6 +7,7 @@ import { StepBar } from "./CreateStep1";
 
 export interface EventSettings {
   maxPhotos: number;
+  unlimitedPhotos: boolean;
   moments: string[];
   prize: string;
   votingOpen: "guests" | "anyone";
@@ -21,12 +22,12 @@ interface CreateStep2Props {
 }
 
 const MOMENT_OPTIONS = [
-  { val: "ceremonia", label: "💒 Ceremonia" },
-  { val: "cocktail", label: "🥂 Cocktail" },
-  { val: "cena", label: "🍽️ Cena" },
-  { val: "baile", label: "🎶 Baile" },
-  { val: "after", label: "🌙 After" },
-  { val: "preparativos", label: "💄 Preparativos" },
+  { val: "ceremonia", label: "Ceremonia" },
+  { val: "cocktail", label: "Cocktail" },
+  { val: "cena", label: "Cena" },
+  { val: "baile", label: "Baile" },
+  { val: "after", label: "After" },
+  { val: "preparativos", label: "Preparativos" },
 ];
 
 export default function CreateStep2({ data, onChange, onNext, onBack }: CreateStep2Props) {
@@ -46,25 +47,42 @@ export default function CreateStep2({ data, onChange, onNext, onBack }: CreateSt
       <div className="px-6 space-y-6 flex-1">
         {/* Max photos stepper */}
         <div>
-          <label className="text-[11px] uppercase tracking-widest text-[#f4efe7]/35 block mb-3">Máximo de fotos por persona</label>
-          <div className="flex items-center gap-4 bg-[#111113] border border-white/[0.08] rounded-2xl p-3">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-[11px] uppercase tracking-widest text-[#f4efe7]/35">Máximo de fotos por persona</label>
             <button
-              onClick={() => onChange({ ...data, maxPhotos: Math.max(5, data.maxPhotos - 5) })}
-              className="w-11 h-11 rounded-xl bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.10] transition-colors"
+              onClick={() => onChange({ ...data, unlimitedPhotos: !data.unlimitedPhotos })}
+              className="flex items-center gap-2 text-xs text-[#f4efe7]/40 hover:text-[#f4efe7]/70 transition-colors"
             >
-              <Minus className="w-4 h-4" />
-            </button>
-            <div className="flex-1 text-center">
-              <span className="text-3xl font-bold tracking-tight">{data.maxPhotos}</span>
-              <p className="text-[#f4efe7]/35 text-xs mt-0.5">fotos</p>
-            </div>
-            <button
-              onClick={() => onChange({ ...data, maxPhotos: Math.min(30, data.maxPhotos + 5) })}
-              className="w-11 h-11 rounded-xl bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.10] transition-colors"
-            >
-              <Plus className="w-4 h-4" />
+              <div className={`w-8 h-4 rounded-full relative transition-colors ${data.unlimitedPhotos ? "bg-[#d9b98a]" : "bg-white/[0.10]"}`}>
+                <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-all ${data.unlimitedPhotos ? "right-0.5" : "left-0.5"}`} />
+              </div>
+              Sin límite
             </button>
           </div>
+          {data.unlimitedPhotos ? (
+            <div className="flex items-center justify-center bg-[#111113] border border-white/[0.08] rounded-2xl p-5">
+              <p className="text-[#d9b98a] font-semibold text-sm">∞ Sin restricción de fotos</p>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4 bg-[#111113] border border-white/[0.08] rounded-2xl p-3">
+              <button
+                onClick={() => onChange({ ...data, maxPhotos: Math.max(5, data.maxPhotos - 5) })}
+                className="w-11 h-11 rounded-xl bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.10] transition-colors"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <div className="flex-1 text-center">
+                <span className="text-3xl font-bold tracking-tight">{data.maxPhotos}</span>
+                <p className="text-[#f4efe7]/35 text-xs mt-0.5">fotos</p>
+              </div>
+              <button
+                onClick={() => onChange({ ...data, maxPhotos: Math.min(30, data.maxPhotos + 5) })}
+                className="w-11 h-11 rounded-xl bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.10] transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          )}
           <p className="text-[#f4efe7]/25 text-xs mt-2">Recomendamos 20 — las mejores fotos, no todas.</p>
         </div>
 
@@ -90,7 +108,7 @@ export default function CreateStep2({ data, onChange, onNext, onBack }: CreateSt
 
         {/* Prize */}
         <div>
-          <label className="text-[11px] uppercase tracking-widest text-[#f4efe7]/35 block mb-3">Premio para la mejor foto 🏆</label>
+          <label className="text-[11px] uppercase tracking-widest text-[#f4efe7]/35 block mb-3">Premio para la mejor foto</label>
           <Input
             value={data.prize}
             onChange={e => onChange({ ...data, prize: e.target.value })}
