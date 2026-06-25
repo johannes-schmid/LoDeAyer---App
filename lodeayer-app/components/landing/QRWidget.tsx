@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function QRWidget() {
   return (
     <Link
-      href="/evento/demo"
+      href="/demo"
       className="hidden md:inline-flex fixed bottom-6 left-6 z-50 items-center gap-4 bg-[#0b0b0c]/80 border border-white/[0.10] rounded-2xl backdrop-blur-xl px-4 py-3 cursor-pointer hover:border-[#d9b98a]/30 transition-colors group shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
     >
       <svg width="52" height="52" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
