@@ -44,7 +44,7 @@ export default function Pricing() {
 
   return (
     <>
-      <section id="precios" className="max-w-6xl mx-auto px-6 py-24">
+      <section id="precios" className="max-w-6xl mx-auto px-5 md:px-6 py-16 md:py-24">
         <div className="text-center mb-16">
           <p className="text-[#d9b98a] text-xs uppercase tracking-[0.18em] mb-4 font-medium">Precios</p>
           <h2 className="text-4xl md:text-5xl font-serif font-light text-[#f4efe7] tracking-tight">

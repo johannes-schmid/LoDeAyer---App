@@ -21,12 +21,13 @@ const steps = [
 
 export default function ComoFunciona() {
   return (
-    <section id="como-funciona" className="max-w-6xl mx-auto px-8 py-24">
+    <section id="como-funciona" className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
         {/* Two overlapping phone mockups */}
         <div className="flex justify-center items-center order-2 lg:order-1">
-          <div className="relative w-[340px] h-[580px]">
+          <div className="relative h-[452px] sm:h-[522px] lg:h-[580px] w-[265px] sm:w-[306px] lg:w-[340px]">
+          <div className="absolute top-0 left-0 w-[340px] h-[580px] origin-top-left scale-[0.78] sm:scale-[0.90] lg:scale-100">
 
             {/* Front phone — on top */}
             <div className="absolute bottom-0 left-0 w-[255px] -rotate-2" style={{ zIndex: 2 }}>
@@ -111,6 +112,7 @@ export default function ComoFunciona() {
               </div>
             </div>
 
+          </div>
           </div>
         </div>
 

@@ -22,7 +22,7 @@ const thumbs = [
 
 export default function LoQueRecibes() {
   return (
-    <section className="max-w-6xl mx-auto px-8 py-24">
+    <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
         <div>
           <p className="text-[#d9b98a] text-xs uppercase tracking-[0.18em] mb-4 font-medium">Lo que recibes</p>

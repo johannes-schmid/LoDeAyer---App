@@ -2,7 +2,7 @@ import { Clock } from "lucide-react";
 
 export default function ElRevelado() {
   return (
-    <section className="max-w-6xl mx-auto px-6 py-24">
+    <section className="max-w-6xl mx-auto px-5 md:px-6 py-16 md:py-24">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* Copy */}
         <div>
@@ -30,7 +30,7 @@ export default function ElRevelado() {
 
         {/* WhatsApp mockup */}
         <div className="flex justify-center">
-          <div className="bg-[#0d1f1c] rounded-3xl p-4 w-[300px] shadow-[0_40px_80px_rgba(0,0,0,0.5)] border border-white/[0.06]">
+          <div className="bg-[#0d1f1c] rounded-3xl p-4 w-full max-w-[300px] shadow-[0_40px_80px_rgba(0,0,0,0.5)] border border-white/[0.06]">
             {/* Header */}
             <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/[0.08]">
               <div className="w-9 h-9 rounded-full bg-[#d9b98a] flex items-center justify-center font-serif text-[#0b0b0c] font-bold text-sm">L</div>
