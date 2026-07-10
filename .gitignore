@@ -1,5 +1,33 @@
+# dependencies
+node_modules/
+
+# env
 .env
 .env.local
 .env*.local
-node_modules/
+
+# turbo
+.turbo/
+
+# next.js
+.next/
+out/
+
+# expo / react-native
+.expo/
+apps/native/dist/
+web-build/
+expo-env.d.ts
+apps/native/ios/
+apps/native/android/
+
+# build output
+dist/
+*.tsbuildinfo
+
+# misc
 .DS_Store
+*.pem
+
+# claude code local (worktrees, local settings)
+.claude/
