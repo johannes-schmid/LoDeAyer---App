@@ -7,18 +7,23 @@ import { ArrowRight, ChevronLeft } from "lucide-react";
 interface NameScreenProps {
   onNext: (name: string, phone: string) => void;
   onBack: () => void;
+  error?: string | null;
 }
 
-export default function NameScreen({ onNext, onBack }: NameScreenProps) {
+export default function NameScreen({ onNext, onBack, error }: NameScreenProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { nameRef.current?.focus(); }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim() && phone.trim()) onNext(name.trim(), phone.trim());
+    if (!name.trim() || !phone.trim() || submitting) return;
+    setSubmitting(true);
+    await onNext(name.trim(), phone.trim());
+    setSubmitting(false);
   };
 
   return (
@@ -76,12 +81,16 @@ export default function NameScreen({ onNext, onBack }: NameScreenProps) {
             </p>
           </div>
 
+          {error && (
+            <p className="text-red-400 text-[13px] text-center px-1">{error}</p>
+          )}
+
           <Button
             type="submit"
-            disabled={!name.trim() || !phone.trim()}
+            disabled={!name.trim() || !phone.trim() || submitting}
             className="w-full h-12 rounded-2xl text-sm font-medium tracking-wide bg-[#d9b98a] text-[#0b0b0c] hover:bg-[#d9b98a]/90 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Entrar <ArrowRight className="w-4 h-4" />
+            {submitting ? "Entrando..." : "Entrar"} <ArrowRight className="w-4 h-4" />
           </Button>
         </form>
       </div>

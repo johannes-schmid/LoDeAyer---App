@@ -12,7 +12,11 @@
     "dev:native": "turbo run dev --filter=native",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:studio": "open http://127.0.0.1:55323"
   },
   "devDependencies": {
     "turbo": "^2.3.3"

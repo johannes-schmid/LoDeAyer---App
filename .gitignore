@@ -29,5 +29,9 @@ dist/
 .DS_Store
 *.pem
 
+# supabase local
+supabase/.temp/
+supabase/.branches/
+
 # claude code local (worktrees, local settings)
 .claude/

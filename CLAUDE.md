@@ -127,6 +127,60 @@ Channels: direct (couples) + B2B (wedding planners, photographers).
 
 ---
 
+## Validated insights — user interviews (Jul 2026)
+
+From two Peru wedding-industry interviews (Estrella Carbone, planner; Ivana T., catering/production).
+These drive feature priority; open questions are flagged.
+
+**Confirmed working**
+- No account + QR-direct upload = right call ("le da flojera" — accounts kill adoption). Fewer steps wins.
+- WhatsApp over email, 100%: identity = phone number, login + reminders via WhatsApp (email needs a
+  computer; nobody reads it). Confirms current design.
+- Couple curation matters: people are particular about unflattering shots of themselves — couples want
+  control over what goes public. AI quality filter well received (automates curation).
+- Album organized by moment (ceremony, dance) validated. The next-morning "Revelado" reveal — everyone
+  hungover watching together, a shared "Game of Thrones night" event — is the core emotional hook.
+
+**#1 open risk — guest adoption.** Both flagged: guests scan the QR once and forget it all night. A
+table QR alone is weak (people are eating/drinking/socializing). Leading idea: **"Capitanes de
+contenido"** — designate 4–6 guests as content captains (riffs on the local "juerguero"/party-captain
+trend); their visible use reminds their circle. The content-creator role is rising (couples now hire
+real-time content creators, e.g. Vertical Content) — this makes many creators out of the guests.
+
+**Prizes drive uploads — must cost the couple nothing** (sourced from event leftovers):
+- Best candidates: leftover sweets/dulces (easiest, always left over), flowers (always thrown out —
+  strong pull, esp. for women), leftover alcohol/mixers. Food/cheese boards = logistically hard.
+- Consider prize categories (best photo of the couple, "party animal", etc.).
+
+**Voting mechanic — unresolved.** 100 guests × many photos = thousands; nobody reviews all, and
+early photos get visibility bias. Proposed fixes: each guest picks ONE photo to enter the contest
+(like choosing a fantasy scorer), and/or cap uploads per guest. Winner notified via WhatsApp with an
+editable pre-filled message.
+
+**Pricing — pushback (open).** Tiers by guest count are gameable (couples just share the link with
+fewer people to pay less) and feel pricey vs a wedding's other vendors. Suggestions: consider a
+single standardized price; differentiate by photos + people, NOT by event moment; position as a
+last-minute impulse add-on (~2 wks pre-wedding) or bundle into planner packages, not early-funnel.
+
+**Capture scope.** Don't limit by moment — couples want everything, and the experience starts at
+"get ready" (prep, first look), not just the party. Consider capturing the full timeline.
+
+**Distribution / partnerships**
+- Planners will upload too (sober, extra angle) — treat as a content source.
+- Highest-leverage channel: embed as a widget in wedding invitation/website platforms.
+  **Sin Envolturas** is the Lima market leader (~80%); also **Novios a Bordo**. Warm intro available:
+  **Claudia Doson** (owner, Sin Envolturas), via Estrella.
+- Monetization angle: dress-rental advertising — guests want to know where a dress is from → ads /
+  affiliate with rental shops.
+
+**Later ideas (parked):** Tinder-style photo liking for singles; personal timeline/chronology of all
+weddings a user attends; comments/social layer on the album.
+
+**Pilot pipeline.** Target: MVP by end of Aug → small Sep events → large event Nov. Ivana offered
+test events: Aug 8 engagement dinner (~30), weddings min 150, one Dec ~70.
+
+---
+
 ## Working rules (from global + project)
 - Look up official docs before building with any external service.
 - Don't add features/abstractions/refactors beyond what's asked; confirm multi-file or schema changes.

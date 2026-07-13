@@ -1,86 +1,42 @@
-"use client";
-import { useState } from "react";
-import WelcomeScreen from "@/components/guest/WelcomeScreen";
-import NameScreen from "@/components/guest/NameScreen";
-import CarreteScreen from "@/components/guest/CarreteScreen";
-import ScanScreen from "@/components/guest/ScanScreen";
-import SuccessScreen from "@/components/guest/SuccessScreen";
-import VoteScreen from "@/components/guest/VoteScreen";
-import RevealScreen from "@/components/guest/RevealScreen";
+import { notFound } from "next/navigation";
+import type { EventRow } from "@lodeayer/shared";
+import { createClient } from "@/lib/supabase/server";
+import { getGuestPhotoState } from "@/lib/guests/actions";
+import EventoClient from "./EventoClient";
 
-type Screen = "welcome" | "name" | "carrete" | "scan" | "success" | "vote" | "reveal";
+function formatEventDate(eventDate: string | null): string | undefined {
+  if (!eventDate) return undefined;
+  const d = new Date(`${eventDate}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return eventDate;
+  return d.toLocaleDateString("es-PE", { day: "numeric", month: "long", year: "numeric" });
+}
 
-const ALL_SCREENS: Screen[] = ["welcome", "name", "carrete", "scan", "success", "vote", "reveal"];
+export default async function EventoPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-export default function EventoPage() {
-  const [screen, setScreen] = useState<Screen>("welcome");
-  const [guestName, setGuestName] = useState("");
-  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
-  const [pendingPhoto, setPendingPhoto] = useState("");
+  const supabase = await createClient();
 
-  const handlePhotoSelected = (dataUrl: string) => {
-    setPendingPhoto(dataUrl);
-    setScreen("scan");
-  };
+  const { data: event } = await supabase
+    .from("events")
+    .select("*")
+    .eq("slug", slug)
+    .single<EventRow>();
 
-  const handleScanApproved = () => {
-    setUploadedPhotos(prev => [pendingPhoto, ...prev]);
-    setScreen("success");
-  };
+  if (!event) notFound();
+
+  const guestState = await getGuestPhotoState(event.id);
 
   return (
-    <div className="min-h-screen bg-[#0b0b0c] flex items-start justify-center">
-      <div
-        className="relative w-full max-w-[430px] min-h-screen bg-[#0b0b0c] overflow-hidden"
-        style={{ touchAction: "manipulation" }}
-      >
-        {ALL_SCREENS.map(s => (
-          <div
-            key={s}
-            className={`absolute inset-0 transition-all duration-300 ${
-              screen === s
-                ? "opacity-100 translate-y-0 pointer-events-auto"
-                : "opacity-0 translate-y-4 pointer-events-none"
-            }`}
-          >
-            {s === "welcome" && <WelcomeScreen onNext={() => setScreen("name")} />}
-            {s === "name" && (
-              <NameScreen
-                onNext={(name) => { setGuestName(name); setScreen("carrete"); }}
-                onBack={() => setScreen("welcome")}
-              />
-            )}
-            {s === "carrete" && (
-              <CarreteScreen
-                name={guestName}
-                uploadedPhotos={uploadedPhotos}
-                onPhotoUpload={handlePhotoSelected}
-                onVote={() => setScreen("vote")}
-              />
-            )}
-            {s === "scan" && (
-              <ScanScreen photoSrc={pendingPhoto} onApproved={handleScanApproved} />
-            )}
-            {s === "success" && (
-              <SuccessScreen
-                name={guestName}
-                uploadedPhotos={uploadedPhotos.length}
-                onContinue={() => setScreen("carrete")}
-                onVote={() => setScreen("vote")}
-              />
-            )}
-            {s === "vote" && (
-              <VoteScreen
-                onSeeReveal={() => setScreen("reveal")}
-                onBack={() => setScreen("carrete")}
-              />
-            )}
-            {s === "reveal" && (
-              <RevealScreen onBack={() => setScreen("vote")} />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
+    <EventoClient
+      eventId={event.id}
+      bannerUrl={event.banner_url}
+      partner1={event.partner1}
+      partner2={event.partner2}
+      city={event.city}
+      date={formatEventDate(event.event_date)}
+      maxPhotosPerGuest={event.max_photos_per_guest}
+      revealAt={event.reveal_at}
+      initialGuestState={guestState}
+    />
   );
 }

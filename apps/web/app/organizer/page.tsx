@@ -1,68 +1,93 @@
-"use client";
-import { useState } from "react";
-import OrgLanding from "@/components/organizer/OrgLanding";
-import CreateStep1, { type EventInfo } from "@/components/organizer/CreateStep1";
-import CreateStep2, { type EventSettings } from "@/components/organizer/CreateStep2";
-import CreateStep3 from "@/components/organizer/CreateStep3";
-import OrgDashboard from "@/components/organizer/OrgDashboard";
-import CurationScreen from "@/components/organizer/CurationScreen";
-import GalleryVoteScreen from "@/components/organizer/GalleryVoteScreen";
-import PrizeScreen from "@/components/organizer/PrizeScreen";
+import Link from "next/link";
+import { ArrowRight, FolderHeart, Plus } from "lucide-react";
+import type { EventRow } from "@lodeayer/shared";
+import { createClient } from "@/lib/supabase/server";
+import OrgAuthFlow from "@/components/organizer/OrgAuthFlow";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
-type Screen = "landing" | "step1" | "step2" | "step3" | "dashboard" | "curation" | "gallery" | "prize";
+export default async function OrganizerPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-const ALL_SCREENS: Screen[] = ["landing", "step1", "step2", "step3", "dashboard", "curation", "gallery", "prize"];
+  if (!user) {
+    return <OrgAuthFlow />;
+  }
 
-const DEFAULT_INFO: EventInfo = { partner1: "", partner2: "", date: "2025-11-14", revealTime: "09:00", venue: "", city: "" };
-const DEFAULT_SETTINGS: EventSettings = { maxPhotos: 20, unlimitedPhotos: false, moments: ["ceremonia", "cocktail", "cena", "baile"], prize: "Botella de champagne Moët", votingOpen: "guests", allowSharing: true };
+  const { data: events } = await supabase
+    .from("events")
+    .select("id,partner1,partner2,event_date,banner_url")
+    .eq("host_id", user.id)
+    .order("created_at", { ascending: false })
+    .returns<Pick<EventRow, "id" | "partner1" | "partner2" | "event_date" | "banner_url">[]>();
 
-export default function OrganizerPage() {
-  const [screen, setScreen] = useState<Screen>("landing");
-  const [info, setInfo] = useState<EventInfo>(DEFAULT_INFO);
-  const [settings, setSettings] = useState<EventSettings>(DEFAULT_SETTINGS);
+  if (!events?.length) {
+    return (
+      <div className="min-h-screen bg-[#0b0b0c] flex items-start justify-center">
+        <div className="relative w-full max-w-[430px] min-h-screen bg-[#0b0b0c] px-6 pt-12 pb-10 flex flex-col">
+          <h1 className="font-serif italic text-2xl font-light mb-6">Mis eventos</h1>
 
-  const eventName = info.partner1 && info.partner2
-    ? `Boda de ${info.partner1} & ${info.partner2}`
-    : "Boda de Ana & Carlos";
+          <Empty className="border-white/[0.08] bg-[#111113] flex-1 justify-center">
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="bg-white/[0.06] text-[#d9b98a]">
+                <FolderHeart />
+              </EmptyMedia>
+              <EmptyTitle className="text-[#f4efe7] font-serif italic text-lg font-normal">
+                Aún no tienes eventos
+              </EmptyTitle>
+              <EmptyDescription className="text-[#f4efe7]/35">
+                Crea tu primer evento para empezar a recibir fotos de tus invitados.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Link
+                href="/organizer/nuevo"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-champagne-gradient text-sm font-medium tracking-wide text-[#0b0b0c] transition hover:brightness-105"
+              >
+                <Plus className="h-4 w-4" /> Crear evento
+              </Link>
+            </EmptyContent>
+          </Empty>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0b0b0c] flex items-start justify-center">
-      <div className="relative w-full max-w-[430px] min-h-screen bg-[#0b0b0c] overflow-hidden" style={{ touchAction: "manipulation" }}>
-        {ALL_SCREENS.map(s => (
-          <div
-            key={s}
-            className={`absolute inset-0 transition-all duration-300 ${
-              screen === s
-                ? "opacity-100 translate-y-0 pointer-events-auto"
-                : "opacity-0 translate-y-4 pointer-events-none"
-            }`}
-          >
-            {s === "landing" && (
-              <OrgLanding onCreate={() => setScreen("step1")} onDemo={() => setScreen("dashboard")} />
-            )}
-            {s === "step1" && (
-              <CreateStep1 data={info} onChange={setInfo} onNext={() => setScreen("step2")} onBack={() => setScreen("landing")} />
-            )}
-            {s === "step2" && (
-              <CreateStep2 data={settings} onChange={setSettings} onNext={() => setScreen("step3")} onBack={() => setScreen("step1")} />
-            )}
-            {s === "step3" && (
-              <CreateStep3 info={info} settings={settings} onConfirm={() => setScreen("dashboard")} onBack={() => setScreen("step2")} />
-            )}
-            {s === "dashboard" && (
-              <OrgDashboard eventName={eventName} onCurate={() => setScreen("curation")} />
-            )}
-            {s === "curation" && (
-              <CurationScreen onPublish={() => setScreen("gallery")} onBack={() => setScreen("dashboard")} />
-            )}
-            {s === "gallery" && (
-              <GalleryVoteScreen onSeePrize={() => setScreen("prize")} onBack={() => setScreen("dashboard")} />
-            )}
-            {s === "prize" && (
-              <PrizeScreen prize={settings.prize} onBack={() => setScreen("gallery")} />
-            )}
-          </div>
-        ))}
+      <div className="relative w-full max-w-[430px] min-h-screen bg-[#0b0b0c] px-6 pt-12 pb-10">
+        <h1 className="font-serif italic text-2xl font-light mb-6">Mis eventos</h1>
+
+        <div className="space-y-3 mb-6">
+          {events.map(e => (
+            <Link
+              key={e.id}
+              href={`/organizer/evento/${e.id}`}
+              className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-[#111113] px-5 py-4 hover:border-white/[0.15] transition-colors"
+            >
+              <div>
+                <p className="font-serif italic text-lg">Boda de {e.partner1} &amp; {e.partner2}</p>
+                {e.event_date && (
+                  <p className="text-[#f4efe7]/35 text-xs mt-0.5">{e.event_date}</p>
+                )}
+              </div>
+              <ArrowRight className="w-4 h-4 text-[#f4efe7]/30" />
+            </Link>
+          ))}
+        </div>
+
+        <Link
+          href="/organizer/nuevo"
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-champagne-gradient text-sm font-medium tracking-wide text-[#0b0b0c] transition hover:brightness-105"
+        >
+          <Plus className="h-4 w-4" /> Crear nuevo evento
+        </Link>
       </div>
     </div>
   );

@@ -24,10 +24,10 @@ interface CreateStep1Props {
   onBack: () => void;
 }
 
-function StepBar({ active }: { active: number }) {
+function StepBar({ steps, active }: { steps: number; active: number }) {
   return (
     <div className="flex gap-1.5 px-6 pt-5 mb-6">
-      {[0, 1, 2].map(i => (
+      {Array.from({ length: steps }, (_, i) => (
         <div key={i} className={`flex-1 h-[3px] rounded-full transition-all ${i < active ? "bg-[#d9b98a]" : i === active ? "bg-[#d9b98a]/40" : "bg-white/[0.08]"}`} />
       ))}
     </div>
@@ -52,9 +52,9 @@ export default function CreateStep1({ data, onChange, onNext, onBack }: CreateSt
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
-      <StepBar active={0} />
+      <StepBar steps={4} active={0} />
       <div className="px-6 mb-6">
-        <p className="text-[#f4efe7]/35 text-[11px] uppercase tracking-widest mb-1">Paso 1 de 3</p>
+        <p className="text-[#f4efe7]/35 text-[11px] uppercase tracking-widest mb-1">Paso 1 de 4</p>
         <h2 className="text-2xl font-bold tracking-tight">Cuéntanos de<br/>tu evento</h2>
       </div>
 

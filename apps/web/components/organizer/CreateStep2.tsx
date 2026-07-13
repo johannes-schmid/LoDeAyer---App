@@ -2,14 +2,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Minus, Plus } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { ChevronLeft } from "lucide-react";
 import { StepBar } from "./CreateStep1";
+
+export type RewardType = "flowers" | "sweets" | "liquor" | "custom" | "none";
 
 export interface EventSettings {
   maxPhotos: number;
   unlimitedPhotos: boolean;
-  moments: string[];
-  prize: string;
+  rewardType: RewardType;
+  rewardLabel: string | null;
   votingOpen: "guests" | "anyone";
   allowSharing: boolean;
 }
@@ -21,26 +24,19 @@ interface CreateStep2Props {
   onBack: () => void;
 }
 
-const MOMENT_OPTIONS = [
-  { val: "ceremonia", label: "Ceremonia" },
-  { val: "cocktail", label: "Cocktail" },
-  { val: "cena", label: "Cena" },
-  { val: "baile", label: "Baile" },
-  { val: "after", label: "After" },
-  { val: "preparativos", label: "Preparativos" },
+const REWARD_OPTIONS: { val: RewardType; label: string }[] = [
+  { val: "flowers", label: "Flores" },
+  { val: "sweets", label: "Dulces" },
+  { val: "liquor", label: "Licor" },
+  { val: "custom", label: "Personalizado" },
 ];
 
 export default function CreateStep2({ data, onChange, onNext, onBack }: CreateStep2Props) {
-  const toggleMoment = (val: string) => {
-    const has = data.moments.includes(val);
-    onChange({ ...data, moments: has ? data.moments.filter(m => m !== val) : [...data.moments, val] });
-  };
-
   return (
     <div className="flex flex-col h-full overflow-y-auto">
-      <StepBar active={1} />
+      <StepBar steps={4} active={2} />
       <div className="px-6 mb-6">
-        <p className="text-[#f4efe7]/35 text-[11px] uppercase tracking-widest mb-1">Paso 2 de 3</p>
+        <p className="text-[#f4efe7]/35 text-[11px] uppercase tracking-widest mb-1">Paso 3 de 4</p>
         <h2 className="text-2xl font-bold tracking-tight">Personaliza<br/>tu álbum</h2>
       </div>
 
@@ -64,57 +60,49 @@ export default function CreateStep2({ data, onChange, onNext, onBack }: CreateSt
               <p className="text-[#d9b98a] font-semibold text-sm">∞ Sin restricción de fotos</p>
             </div>
           ) : (
-            <div className="flex items-center gap-4 bg-[#111113] border border-white/[0.08] rounded-2xl p-3">
-              <button
-                onClick={() => onChange({ ...data, maxPhotos: Math.max(5, data.maxPhotos - 5) })}
-                className="w-11 h-11 rounded-xl bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.10] transition-colors"
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <div className="flex-1 text-center">
+            <div className="bg-[#111113] border border-white/[0.08] rounded-2xl p-5">
+              <div className="text-center mb-4">
                 <span className="text-3xl font-bold tracking-tight">{data.maxPhotos}</span>
                 <p className="text-[#f4efe7]/35 text-xs mt-0.5">fotos</p>
               </div>
-              <button
-                onClick={() => onChange({ ...data, maxPhotos: Math.min(30, data.maxPhotos + 5) })}
-                className="w-11 h-11 rounded-xl bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.10] transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              <Slider
+                value={data.maxPhotos}
+                onValueChange={(v) => onChange({ ...data, maxPhotos: v as number })}
+                min={5}
+                max={30}
+                step={5}
+              />
             </div>
           )}
           <p className="text-[#f4efe7]/25 text-xs mt-2">Recomendamos 20 — las mejores fotos, no todas.</p>
         </div>
 
-        {/* Moments */}
+        {/* Reward */}
         <div>
-          <label className="text-[11px] uppercase tracking-widest text-[#f4efe7]/35 block mb-3">Momentos del evento</label>
-          <div className="flex flex-wrap gap-2">
-            {MOMENT_OPTIONS.map(m => (
+          <label className="text-[11px] uppercase tracking-widest text-[#f4efe7]/35 block mb-3">Premio para la mejor foto</label>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {REWARD_OPTIONS.map(r => (
               <button
-                key={m.val}
-                onClick={() => toggleMoment(m.val)}
+                key={r.val}
+                onClick={() => onChange({ ...data, rewardType: r.val, rewardLabel: r.val === "custom" ? data.rewardLabel : r.label })}
                 className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
-                  data.moments.includes(m.val)
+                  data.rewardType === r.val
                     ? "bg-[#d9b98a]/10 border-[#d9b98a]/40 text-[#d9b98a]"
                     : "bg-transparent border-white/[0.09] text-[#f4efe7]/50"
                 }`}
               >
-                {m.label}
+                {r.label}
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Prize */}
-        <div>
-          <label className="text-[11px] uppercase tracking-widest text-[#f4efe7]/35 block mb-3">Premio para la mejor foto</label>
-          <Input
-            value={data.prize}
-            onChange={e => onChange({ ...data, prize: e.target.value })}
-            placeholder="Ej: Botella de champagne"
-            className="bg-[#111113] border-white/[0.08] text-[#f4efe7] placeholder:text-[#f4efe7]/20 h-14 rounded-2xl focus-visible:ring-[#d9b98a]/30 focus-visible:border-[#d9b98a]/40"
-          />
+          {data.rewardType === "custom" && (
+            <Input
+              value={data.rewardLabel ?? ""}
+              onChange={e => onChange({ ...data, rewardLabel: e.target.value })}
+              placeholder="Ej: Botella de champagne"
+              className="bg-[#111113] border-white/[0.08] text-[#f4efe7] placeholder:text-[#f4efe7]/20 h-14 rounded-2xl focus-visible:ring-[#d9b98a]/30 focus-visible:border-[#d9b98a]/40"
+            />
+          )}
           <p className="text-[#f4efe7]/25 text-xs mt-2">El ganador lo decide la votación de los invitados.</p>
         </div>
 
