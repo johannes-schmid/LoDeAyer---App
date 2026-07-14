@@ -95,21 +95,16 @@ export async function getGuestPhotoState(eventId: string): Promise<GuestPhotoSta
   };
 }
 
-export async function uploadGuestPhoto(eventId: string, formData: FormData): Promise<GuestPhoto> {
+// The guest's browser uploads the photo bytes straight to Supabase Storage
+// (see EventoClient.tsx) rather than routing them through this server action —
+// Next.js server actions cap request bodies at 1MB by default, which real
+// phone photos blow past easily. This action only registers the already
+// uploaded object against the guest's account.
+export async function registerGuestPhoto(eventId: string, storagePath: string): Promise<GuestPhoto> {
   const guestId = await getGuestId(eventId);
   if (!guestId) throw new Error("No estas registrado en este evento.");
 
-  const file = formData.get("file");
-  if (!(file instanceof File)) throw new Error("Archivo invalido.");
-
   const supabase = await createClient();
-  const ext = file.name.split(".").pop() || "jpg";
-  const storagePath = `${eventId}/${guestId}/${crypto.randomUUID()}.${ext}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from("event-photos")
-    .upload(storagePath, file, { contentType: file.type });
-  if (uploadError) throw uploadError;
 
   const { data: photo, error: rpcError } = await supabase
     .rpc("add_guest_photo", { p_guest_id: guestId, p_storage_path: storagePath })

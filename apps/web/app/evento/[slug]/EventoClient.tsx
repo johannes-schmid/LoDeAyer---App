@@ -7,7 +7,7 @@ import VoteScreen from "@/components/guest/VoteScreen";
 import RevealScreen from "@/components/guest/RevealScreen";
 import {
   joinGuest,
-  uploadGuestPhoto,
+  registerGuestPhoto,
   deleteGuestPhoto,
   reorderGuestPhotos,
   setFavoritePhoto,
@@ -16,6 +16,7 @@ import {
   type GuestPhotoState,
 } from "@/lib/guests/actions";
 import { isHeicFile, toDisplayableImage } from "@/lib/heic";
+import { createClient } from "@/lib/supabase/client";
 
 type Screen = "welcome" | "name" | "carrete" | "vote" | "reveal";
 
@@ -88,9 +89,19 @@ export default function EventoClient({
 
     try {
       const displayable = await toDisplayableImage(file);
-      const formData = new FormData();
-      formData.set("file", displayable);
-      const uploaded = await uploadGuestPhoto(eventId, formData);
+
+      // Upload the bytes straight to Supabase Storage from the browser — Next.js
+      // server actions cap request bodies at 1MB by default, which real phone
+      // photos exceed easily (this is what made HEIC uploads 500 in production).
+      const ext = displayable.name.split(".").pop() || "jpg";
+      const storagePath = `${eventId}/${crypto.randomUUID()}/${crypto.randomUUID()}.${ext}`;
+      const supabase = createClient();
+      const { error: uploadError } = await supabase.storage
+        .from("event-photos")
+        .upload(storagePath, displayable, { contentType: displayable.type });
+      if (uploadError) throw uploadError;
+
+      const uploaded = await registerGuestPhoto(eventId, storagePath);
       setUploadedPhotos(prev => prev.map(p => (p.id === tempId ? uploaded : p)));
     } catch {
       setUploadedPhotos(prev => prev.filter(p => p.id !== tempId));
