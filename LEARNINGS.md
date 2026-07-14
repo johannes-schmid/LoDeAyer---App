@@ -17,6 +17,11 @@ Format: what went wrong (or what we learned) → the fix / rule to follow.
   Plan a Node 22 upgrade; when done, we can move to pnpm 11.
 - **Expo + pnpm needs `.npmrc` with `node-linker=hoisted`** (we also set `shamefully-hoist=true`).
   Without it, Metro/React Native can't resolve hoisted deps. Keep this file.
+- **Every route 500s locally without Supabase env** → `proxy.ts` (middleware) calls
+  `createServerClient` on every request and throws `Your project's URL and Key are required` when
+  `NEXT_PUBLIC_SUPABASE_URL` / `..._ANON_KEY` are unset (e.g. a fresh clone with no `.env.local`).
+  This is env, not a code bug. To smoke-test UI without a real project, run dev with dummy values:
+  `NEXT_PUBLIC_SUPABASE_URL=https://demo.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=demo pnpm dev:web`.
 
 ## Supabase local (Docker)
 

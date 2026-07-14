@@ -149,6 +149,70 @@ body::after {
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { scrollbar-width: none; }
 
+/* Brand loader — camera "focus lock" (reuses the logo reticle) */
+@keyframes loader-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes loader-brackets-focus {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(0.8); opacity: 1; }
+}
+@keyframes loader-ring-pulse {
+  0%, 100% { transform: scale(0.92); opacity: 0.55; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+@keyframes loader-dot-pulse {
+  0%, 100% { transform: scale(0.7); opacity: 0.4; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+@keyframes loader-arc-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes loader-dots {
+  0% { content: ""; }
+  25% { content: "·"; }
+  50% { content: "··"; }
+  75%, 100% { content: "···"; }
+}
+
+.loader-fade-in { animation: loader-fade-in 0.4s ease both; }
+.loader-arc {
+  transform-origin: center;
+  animation: loader-arc-spin 1.6s linear infinite;
+}
+.loader-brackets {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: loader-brackets-focus 1.8s ease-in-out infinite;
+}
+.loader-focus-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: loader-ring-pulse 1.8s ease-in-out infinite;
+}
+.loader-focus-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: loader-dot-pulse 1.8s ease-in-out infinite;
+}
+.loader-dots::after {
+  content: "···";
+  animation: loader-dots 1.6s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-arc,
+  .loader-brackets,
+  .loader-focus-ring,
+  .loader-focus-dot,
+  .loader-dots::after {
+    animation: none;
+  }
+  .loader-focus-ring { opacity: 0.9; }
+  .loader-dots::after { content: "···"; }
+}
+
 /* Screen transition */
 .screen-enter {
   opacity: 0;
