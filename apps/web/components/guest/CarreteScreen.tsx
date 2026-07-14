@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { Camera, Plus, Star, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toDisplayableImage } from "@/lib/heic";
+import LogoSpinner from "@/components/ui/LogoSpinner";
 import type { GuestPhoto } from "@/lib/guests/actions";
 
 const LONG_PRESS_MS = 500;
@@ -53,15 +53,14 @@ export default function CarreteScreen({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    files.forEach(async file => {
-      const displayable = await toDisplayableImage(file);
-      onPhotoUpload(displayable);
-    });
+    files.forEach(file => onPhotoUpload(file));
     e.target.value = "";
   };
 
   const startPress = (photoId: string) => {
     if (isLocked) return;
+    const photo = uploadedPhotos.find(p => p.id === photoId);
+    if (photo?.uploading) return;
     pressTimer.current = setTimeout(() => setActivePhotoId(photoId), LONG_PRESS_MS);
   };
 
@@ -172,7 +171,18 @@ export default function CarreteScreen({
                     if (!isLocked) setActivePhotoId(photo.id);
                   }}
                 >
-                  <img src={photo.url} alt="" className="w-full h-full object-cover" draggable={false} />
+                  {photo.url ? (
+                    <img src={photo.url} alt="" className="w-full h-full object-cover" draggable={false} />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <LogoSpinner size={24} />
+                    </div>
+                  )}
+                  {photo.uploading && photo.url && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <LogoSpinner size={24} />
+                    </div>
+                  )}
                   {photo.isFavorite && (
                     <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#d9b98a] flex items-center justify-center">
                       <Star className="w-3 h-3 text-[#0b0b0c]" fill="currentColor" />

@@ -12,6 +12,8 @@ export interface GuestPhoto {
   id: string;
   url: string;
   isFavorite: boolean;
+  /** Client-side only: true while the photo is still converting/uploading. */
+  uploading?: boolean;
 }
 
 export interface GuestPhotoState {

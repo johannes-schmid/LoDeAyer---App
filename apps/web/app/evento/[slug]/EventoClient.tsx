@@ -15,6 +15,7 @@ import {
   type GuestPhoto,
   type GuestPhotoState,
 } from "@/lib/guests/actions";
+import { isHeicFile, toDisplayableImage } from "@/lib/heic";
 
 type Screen = "welcome" | "name" | "carrete" | "vote" | "reveal";
 
@@ -77,18 +78,24 @@ export default function EventoClient({
 
   const handlePhotoSelected = async (file: File) => {
     const tempId = `pending-${crypto.randomUUID()}`;
-    const previewUrl = URL.createObjectURL(file);
-    setUploadedPhotos(prev => [...prev, { id: tempId, url: previewUrl, isFavorite: false }]);
+    // HEIC blobs can't be rendered by <img>, so skip the instant preview and
+    // rely on the spinner placeholder until the conversion below finishes.
+    const previewUrl = isHeicFile(file) ? null : URL.createObjectURL(file);
+    setUploadedPhotos(prev => [
+      ...prev,
+      { id: tempId, url: previewUrl ?? "", isFavorite: false, uploading: true },
+    ]);
 
     try {
+      const displayable = await toDisplayableImage(file);
       const formData = new FormData();
-      formData.set("file", file);
+      formData.set("file", displayable);
       const uploaded = await uploadGuestPhoto(eventId, formData);
       setUploadedPhotos(prev => prev.map(p => (p.id === tempId ? uploaded : p)));
     } catch {
       setUploadedPhotos(prev => prev.filter(p => p.id !== tempId));
     } finally {
-      URL.revokeObjectURL(previewUrl);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
     }
   };
 

@@ -8,9 +8,14 @@ export function isHeicFile(file: File): boolean {
 export async function toDisplayableImage(file: File): Promise<File> {
   if (!isHeicFile(file)) return file;
 
-  const heic2any = (await import("heic2any")).default;
-  const result = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
-  const blob = Array.isArray(result) ? result[0] : result;
-  const name = file.name.replace(HEIC_EXT, "") + ".jpg";
-  return new File([blob], name, { type: "image/jpeg" });
+  try {
+    const heic2any = (await import("heic2any")).default;
+    const result = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+    const blob = Array.isArray(result) ? result[0] : result;
+    const name = file.name.replace(HEIC_EXT, "") + ".jpg";
+    return new File([blob], name, { type: "image/jpeg" });
+  } catch (err) {
+    console.warn("No se pudo convertir la foto HEIC, se sube el original.", err);
+    return file;
+  }
 }
