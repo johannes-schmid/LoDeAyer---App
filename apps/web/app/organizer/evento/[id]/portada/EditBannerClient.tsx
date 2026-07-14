@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import CreateStepBanner from "@/components/organizer/CreateStepBanner";
+import CreatingEventOverlay from "@/components/organizer/CreatingEventOverlay";
 import type { EventInfo } from "@/components/organizer/CreateStep1";
 import { createClient } from "@/lib/supabase/client";
 import { updateEventBanner } from "@/lib/events/actions";
@@ -43,17 +44,20 @@ export default function EditBannerClient({ eventId, info, currentBannerUrl }: Ed
   }
 
   return (
-    <CreateStepBanner
-      file={file}
-      existingBannerUrl={removed ? null : currentBannerUrl}
-      onChange={f => {
-        setFile(f);
-        setRemoved(!f);
-      }}
-      onNext={saving ? () => {} : handleSave}
-      onBack={() => router.push(`/organizer/evento/${eventId}`)}
-      info={info}
-      editMode
-    />
+    <>
+      <CreateStepBanner
+        file={file}
+        existingBannerUrl={removed ? null : currentBannerUrl}
+        onChange={f => {
+          setFile(f);
+          setRemoved(!f);
+        }}
+        onNext={saving ? () => {} : handleSave}
+        onBack={() => router.push(`/organizer/evento/${eventId}`)}
+        info={info}
+        editMode
+      />
+      <CreatingEventOverlay show={saving} message="Guardando foto" />
+    </>
   );
 }

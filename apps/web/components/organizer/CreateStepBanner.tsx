@@ -1,10 +1,11 @@
 "use client";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ImagePlus } from "lucide-react";
 import { StepBar } from "./CreateStep1";
 import type { EventInfo } from "./CreateStep1";
 import WelcomeScreen from "@/components/guest/WelcomeScreen";
+import LogoSpinner from "@/components/ui/LogoSpinner";
 import { toDisplayableImage } from "@/lib/heic";
 
 interface CreateStepBannerProps {
@@ -19,6 +20,7 @@ interface CreateStepBannerProps {
 
 export default function CreateStepBanner({ file, onChange, onNext, onBack, info, existingBannerUrl, editMode }: CreateStepBannerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [converting, setConverting] = useState(false);
   const previewUrl = file ? URL.createObjectURL(file) : (existingBannerUrl ?? null);
 
   const formattedDate = useMemo(() => {
@@ -45,8 +47,17 @@ export default function CreateStepBanner({ file, onChange, onNext, onBack, info,
           accept="image/*,.heic,.heif"
           className="hidden"
           onChange={async e => {
-            const file = e.target.files?.[0] ?? null;
-            onChange(file ? await toDisplayableImage(file) : null);
+            const selected = e.target.files?.[0] ?? null;
+            if (!selected) {
+              onChange(null);
+              return;
+            }
+            setConverting(true);
+            try {
+              onChange(await toDisplayableImage(selected));
+            } finally {
+              setConverting(false);
+            }
           }}
         />
 
@@ -68,13 +79,18 @@ export default function CreateStepBanner({ file, onChange, onNext, onBack, info,
             onClick={() => inputRef.current?.click()}
             className="absolute top-0 left-0 right-0 h-[55%] flex flex-col items-center justify-center gap-2 text-white/80 bg-black/0 hover:bg-black/30 transition-colors"
           >
-            {!previewUrl && (
+            {!previewUrl && !converting && (
               <>
                 <ImagePlus className="w-7 h-7" />
                 <span className="text-sm font-medium">Subir foto de portada</span>
               </>
             )}
           </button>
+          {converting && (
+            <div className="absolute inset-0 bg-[#0b0b0c]/70 flex items-center justify-center">
+              <LogoSpinner size={40} />
+            </div>
+          )}
         </div>
 
         {previewUrl && (
