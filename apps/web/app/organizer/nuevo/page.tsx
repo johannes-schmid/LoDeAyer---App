@@ -4,6 +4,7 @@ import CreateStep1, { type EventInfo } from "@/components/organizer/CreateStep1"
 import CreateStepBanner from "@/components/organizer/CreateStepBanner";
 import CreateStep2, { type EventSettings } from "@/components/organizer/CreateStep2";
 import CreateStep3 from "@/components/organizer/CreateStep3";
+import CreatingEventOverlay from "@/components/organizer/CreatingEventOverlay";
 import { createEvent } from "@/lib/events/actions";
 import { createClient } from "@/lib/supabase/client";
 
@@ -71,6 +72,7 @@ export default function NuevoEventoPage() {
           />
         )}
       </div>
+      <CreatingEventOverlay show={submitting} />
     </div>
   );
 }
